@@ -1,0 +1,55 @@
+{
+  parserClass="com.interfaced.brs.lang.parser.BSParser"
+  parserUtilClass="com.interfaced.brs.lang.parser.BSParserUtil"
+
+  elementTypeHolderClass="com.interfaced.brs.lang.psi.BSTypes"
+  elementTypeClass="com.interfaced.brs.lang.psi.BSCompositeElementType"
+  tokenTypeClass="com.interfaced.brs.lang.psi.BSTokenType"
+
+  psiClassPrefix="BS"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.interfaced.brs.lang.psi"
+  psiImplPackage="com.interfaced.brs.lang.psi.impl"
+}
+
+BSProgram ::= statement*
+statement ::= (if|for|while|function|print|comment|goto|dim|stop)
+dim ::= T_DIM T_IDENTIFIER "[" dimension_list "]"
+assign ::= T_IDENTIFIER "=" expression
+stop ::= T_STOP
+goto ::= T_GOTO label
+label ::= T_IDENTIFIER T_COLON
+return ::= T_RETURN expression?
+print ::= T_PRINT expression
+and ::= T_AND expression
+
+for ::= (for_counter|for_each) (statement|exit_for)* end_for
+while ::= T_WHILE expression (statement|exit_while)* end_while
+
+if ::= (if_line|if_block)
+if_line ::= if_then statement* (T_ELSE statement*)? "\n"
+if_block ::= if_then (statement|else|else_if)* end_if
+
+if_then ::= T_IF expression T_THEN?
+else ::= T_ELSE statement*
+else_if ::= T_ELSE if_then statement*
+
+for_counter ::= T_FOR T_IDENTIFIER "=" expression T_TO expression step?
+for_each ::= T_FOR T_EACH T_IDENTIFIER T_IN T_IDENTIFIER
+function ::= T_FUNCTION T_IDENTIFIER "(" parameter_list? ")" as? (statement|return)* end_function
+as ::= T_AS type
+type ::= T_IDENTIFIER
+parameter_list ::= parameter { "," parameter }*
+parameter ::= T_IDENTIFIER default? as?
+default ::= "=" expression
+exit_while ::= T_EXIT T_WHILE
+exit_for ::= T_EXIT T_FOR
+end_for ::= T_END T_FOR
+end_while ::= T_END T_WHILE
+end_if ::= T_END T_IF
+end_function ::= T_END T_FUNCTION
+step ::= T_STEP expression
+expression ::= (chars|and|assign|T_STRING_LITERAL)
+dimension_list ::= chars
+comment ::= (T_QUOTE|T_REM) T_COMMENT
+chars ::= T_CHAR+
