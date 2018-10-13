@@ -44,28 +44,64 @@ While = "while"
 Goto = "goto"
 Each = "each"
 And = "and"
+Or = "or"
 To = "to"
 In = "in"
+Mod = "mod"
+Not = "not"
+Sub = "sub"
 
 Quote = "'"
 Colon = ":"
 
-// Designators
-Str = "$"
-Int = "%"
-Float = "!"
-Double = "#"
-Designator = ({Str}|{Int}|{Float}|{Double})
+// Operators
+LeftShift = "<<"
+RightShift = ">>"
+LeftShiftAssign = {LeftShift} "="
+RightShiftAssign = {RightShift} "="
+AddAssign = "+="
+SubAssin = "-="
+MulAssign = "*="
+DivAssign = "/="
+// TODO: Finde more prefered name
+BackDivAssign = "\\="
+LessEq = "<="
+GreatEq = ">="
+Inequal = "<>"
+
+// Types
+Integer = "integer"
+Float = "float"
+Double = "double"
+Boolean = "boolean"
+String = "string"
+Object = "object"
+Dynamic = "dynamic"
+Void = "void"
 
 Identifier = [a-zA-Z\_][a-zA-Z\_0-9]*
 StringLiteral = "\"" ~"\""
 
-%state COMMENT, DESIGNATOR
+%state S_COMMENT, S_TYPE
 %%
 
-{Quote} { yybegin(COMMENT); return T_QUOTE; }
-{Rem} { yybegin(COMMENT); return T_REM; }
+<S_TYPE> {
+    {Integer} { yybegin(YYINITIAL); return T_INTEGER; }
+    {Float} { yybegin(YYINITIAL); return T_FLOAT; }
+    {Double} { yybegin(YYINITIAL); return T_DOUBLE; }
+    {Boolean} { yybegin(YYINITIAL); return T_BOOLEAN; }
+    {String} { yybegin(YYINITIAL); return T_STRING; }
+    {Object} { yybegin(YYINITIAL); return T_OBJECT; }
+    {Dynamic} { yybegin(YYINITIAL); return T_DYNAMIC; }
+    {Void} { yybegin(YYINITIAL); return T_VOID; }
+    {Function} { yybegin(YYINITIAL); return T_FUNCTION; }
+}
+
+{Quote} { yybegin(S_COMMENT); return T_QUOTE; }
+{Rem} { yybegin(S_COMMENT); return T_REM; }
 {Function} { return T_FUNCTION; }
+{Sub} { return T_SUB; }
+{As} { yybegin(S_TYPE); return T_AS; }
 {If} { return T_IF; }
 {Then} { return T_THEN; }
 {End} { return T_END; }
@@ -73,7 +109,6 @@ StringLiteral = "\"" ~"\""
 {For} { return T_FOR; }
 {Step} { return T_STEP; }
 {Exit} { return T_EXIT; }
-{As} { return T_AS; }
 {Return} { return T_RETURN; }
 {Print} { return T_PRINT; }
 {Dim} { return T_DIM; }
@@ -83,20 +118,30 @@ StringLiteral = "\"" ~"\""
 {Each} { return T_EACH; }
 {Colon} { return T_COLON; }
 {And} { return T_AND; }
+{Or} { return T_OR; }
 {To} { return T_TO; }
 {In} { return T_IN; }
+{Mod} { return T_MOD; }
+{Not} { return T_NOT; }
 {StringLiteral} { return T_STRING_LITERAL; }
 {Identifier} { return T_IDENTIFIER; }
-{Designator} { yypushback(1); yybegin(DESIGNATOR); }
 
-<DESIGNATOR> {
-    {Str} { yybegin(YYINITIAL); return T_STR_DESIGNATOR; }
-    {Int} { yybegin(YYINITIAL); return T_INT_DESIGNATOR; }
-    {Float} { yybegin(YYINITIAL); return T_FLOAT_DESIGNATOR; }
-    {Double} { yybegin(YYINITIAL); return T_DOUBLE_DESIGNATOR; }
-}
+{LeftShift} { return T_LEFT_SHIFT; }
+{RightShift} { return T_RIGHT_SHIFT; }
+{LeftShiftAssign} { return T_LEFT_SHIFT_ASSIGN; }
+{RightShiftAssign} { return T_RIGHT_SHIFT_ASSIGN; }
+{AddAssign} { return T_ADD_ASSIGN; }
+{SubAssin} { return T_SUB_ASSIGN; }
+{MulAssign} { return T_MUL_ASSIGN; }
+{DivAssign} { return T_DIV_ASSIGN; }
+{BackDivAssign} { return T_BACK_DIV_ASSIGN; }
+{LessEq} { return T_LESS_EQ; }
+{GreatEq} { return T_GREAT_EQ; }
+{Inequal} { return T_INEQUAL; }
 
-<COMMENT> ~{LineTerminator} { yybegin(YYINITIAL); return T_COMMENT; }
+[:digit:]+ { return T_NUMBER; }
+
+<S_COMMENT> ~{LineTerminator} { yybegin(YYINITIAL); return T_COMMENT; }
 
 {WhiteSpace}+ { return WHITE_SPACE; }
 

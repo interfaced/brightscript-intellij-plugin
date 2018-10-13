@@ -10,46 +10,118 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.interfaced.brs.lang.psi"
   psiImplPackage="com.interfaced.brs.lang.psi.impl"
+
+  consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
+  extends(".*expr")=expr
 }
 
-BSProgram ::= statement*
-statement ::= (if|for|while|function|print|comment|goto|dim|stop|return|exit)
-dim ::= T_DIM identifier "[" dimension_list "]"
-assign ::= identifier "=" expression
+BrsProgram ::= (statement|chars) *
+
+// Statements
+private statement ::=
+    if
+  | for
+  | while
+  | function
+  | sub
+  | print
+  | comment
+  | goto
+  | dim
+  | stop
+  | return
+  | assign
+  | expr
+
+return ::= T_RETURN expr?
+dim ::= T_DIM identifier dimension_list
 stop ::= T_STOP
 goto ::= T_GOTO label
 label ::= identifier T_COLON
-return ::= T_RETURN expression?
-print ::= T_PRINT expression
-and ::= T_AND expression
+print ::= T_PRINT expr
+assign ::= expr assign_op expr
+for ::= ( for_counter | for_each ) ( statement | exit_for ) * end_for
+while ::= T_WHILE expr ( statement | exit_while ) * end_while
+if ::= if_then ( statement | else ) * end_if
+comment ::= ( T_QUOTE | T_REM ) T_COMMENT
 
-exit ::= (exit_while|exit_for)
-for ::= (for_counter|for_each) (statement)* end_for
-while ::= T_WHILE expression (statement)* end_while
-
-if ::= if_then (statement|else)* end_if
-
-if_then ::= T_IF expression T_THEN?
-else ::= T_ELSE if_then? statement*
-
-for_counter ::= T_FOR identifier "=" expression T_TO expression step?
-for_each ::= T_FOR T_EACH identifier T_IN identifier
-function ::= T_FUNCTION identifier "(" parameter_list? ")" as? (statement)* end_function
+if_then ::= T_IF expr T_THEN?
+else ::= T_ELSE if_then? statement *
+private for_counter ::= T_FOR identifier "=" expr T_TO expr step?
+private for_each ::= T_FOR T_EACH identifier T_IN identifier
+function ::= T_FUNCTION function_definition end_function
+sub ::= T_SUB function_definition end_sub
+private function_definition ::= identifier parameter_list as? statement *
 as ::= T_AS type
-type ::= T_IDENTIFIER
-parameter_list ::= parameter { "," parameter }*
+type ::= T_INTEGER | T_FLOAT | T_DOUBLE | T_BOOLEAN | T_STRING | T_OBJECT | T_DYNAMIC | T_FUNCTION | T_VOID
+parameter_list ::= '(' [ !')' parameter (',' parameter) * ] ')' {pin(".*")=1}
 parameter ::= identifier default? as?
-default ::= "=" expression
+default ::= "=" expr
+
 exit_while ::= T_EXIT T_WHILE
 exit_for ::= T_EXIT T_FOR
 end_for ::= T_END T_FOR
 end_while ::= T_END T_WHILE
 end_if ::= T_END T_IF
+end_sub ::= T_END T_SUB
 end_function ::= T_END T_FUNCTION
-step ::= T_STEP expression
-expression ::= (chars|and|assign|T_STRING_LITERAL|identifier)
+step ::= T_STEP expr
+
+// Expressions
+expr ::=
+    or_expr
+  | and_expr
+  | comp_expr
+  | bit_shift_expr
+  | add_expr
+  | mul_expr
+  | unary_expr
+  | exponential_expr
+  | call_expr
+  | qualification_expr
+  | index_access_expr
+  | primary_group
+
+private primary_group ::= simple_ref_expr | literal_expr | new_array_expr
+
+fake ref_expr ::= expr? '.' identifier
+simple_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
+qualification_expr ::= expr '.' identifier {extends=ref_expr elementType=ref_expr }
+call_expr ::= ref_expr arg_list
+arg_list ::= '(' [ !')' expr (',' expr) * ] ')' { pin(".*")=1 }
+
+fake array_expr ::= expr? array
+new_array_expr ::= array { extends=array_expr elementType=array_expr }
+index_access_expr ::= expr array { extends=array_expr elementType=array_expr }
+
+array ::= '[' expr (',' expr) * ']' { pin(".*")=1 }
+literal_expr ::= T_NUMBER | T_STRING_LITERAL
+and_expr ::= expr T_AND expr
+or_expr ::= expr T_OR expr
+comp_expr ::= expr comp_op expr
+bit_shift_expr ::= expr bit_shift_op expr
+add_expr ::= expr add_op expr
+mul_expr ::= expr mul_op expr
+unary_expr ::= unary_op expr
+exponential_expr ::= expr '^' expr
+
+assign_op ::=
+    '='
+    | T_LEFT_SHIFT_ASSIGN
+    | T_RIGHT_SHIFT_ASSIGN
+    | T_ADD_ASSIGN
+    | T_SUB_ASSIGN
+    | T_MUL_ASSIGN
+    | T_DIV_ASSIGN
+    | T_BACK_DIV_ASSIGN
+
+comp_op ::= '<' | '>' | '=' | T_GREAT_EQ | T_LESS_EQ | T_INEQUAL
+bit_shift_op ::= T_LEFT_SHIFT | T_RIGHT_SHIFT
+add_op ::= '-' | '+'
+mul_op ::= '*' | '/' | '\' | T_MOD
+unary_op ::= T_NOT | '-' | '+'
+
 identifier ::= T_IDENTIFIER type_designator?
-type_designator ::= (T_INT_DESIGNATOR|T_STR_DESIGNATOR|T_FLOAT_DESIGNATOR|T_DOUBLE_DESIGNATOR)
-dimension_list ::= chars
-comment ::= (T_QUOTE|T_REM) T_COMMENT
+type_designator ::= '$' | '%' | '!' | '#' | '&'
+dimension_list ::= "[" [ !']' T_NUMBER ( ',' T_NUMBER ) * ] "]" { pin(".*")=1 }
 chars ::= T_CHAR+
