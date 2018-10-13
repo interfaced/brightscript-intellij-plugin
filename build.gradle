@@ -8,12 +8,12 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.github.JetBrains:gradle-grammar-kit-plugin:2018.1.7"
     }
 }
 
 plugins {
     id 'org.jetbrains.intellij' version '0.3.4'
+    id "org.jetbrains.grammarkit" version "2018.2"
 }
 
 group 'com.interfaced'
@@ -64,7 +64,7 @@ def GENERATE_GROUP = 'Generate'
 task generateLexer(type: GenerateLexer) {
     source = "src/main/grammar/BrightScript.flex"
     targetDir = "src/main/gen/com/interfaced/brs/lang/lexer"
-    targetClass = "_BSLexer"
+    targetClass = "_BrsLexer"
     skeleton = "src/main/grammar/idea-flex.skeleton"
     purgeOldFiles = true
 
@@ -75,7 +75,7 @@ task generateLexer(type: GenerateLexer) {
 task generateParser(type: GenerateParser) {
     source = "src/main/grammar/BrightScript.bnf"
     targetRoot = 'src/main/gen'
-    pathToParser = 'src/main/gen/com/interfaced/brs/lang/BSParser.java'
+    pathToParser = 'src/main/gen/com/interfaced/brs/lang/BrsParser.java'
     pathToPsiRoot = 'src/main/gen/com/interfaced/brs/lang/psi'
     purgeOldFiles = true
 
@@ -85,7 +85,9 @@ task generateParser(type: GenerateParser) {
     // patch up to date check
     outputs.upToDateWhen { false }
 }
+
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 compileKotlin.dependsOn(generateLexer, generateParser)

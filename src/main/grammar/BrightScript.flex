@@ -3,28 +3,26 @@ package com.interfaced.brs.lang.lexer;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 
-import static com.interfaced.brs.lang.psi.BSTypes.*;
+import static com.interfaced.brs.lang.psi.BrsTypes.*;
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 %%
 
 %{
-    public _BSLexer() {
+    public _BrsLexer() {
         this((java.io.Reader)null);
     }
 %}
 
 %public
-%class _BSLexer
+%class _BrsLexer
 %implements FlexLexer
 %function advance
 %type IElementType
 %unicode
 %ignorecase
 
-
 LineTerminator = \r|\n|\r\n
-InputCharacter = [^\r\n]
 WhiteSpace     = {LineTerminator} | [ \t\f]
 
 // Reserved words
@@ -57,11 +55,12 @@ Str = "$"
 Int = "%"
 Float = "!"
 Double = "#"
+Designator = ({Str}|{Int}|{Float}|{Double})
 
-Identifier = [a-zA-Z\_][a-zA-Z\_0-9]*({Str}|{Int}|{Float}|{Double})?
+Identifier = [a-zA-Z\_][a-zA-Z\_0-9]*
 StringLiteral = "\"" ~"\""
 
-%state COMMENT
+%state COMMENT, DESIGNATOR
 %%
 
 {Quote} { yybegin(COMMENT); return T_QUOTE; }
@@ -88,6 +87,14 @@ StringLiteral = "\"" ~"\""
 {In} { return T_IN; }
 {StringLiteral} { return T_STRING_LITERAL; }
 {Identifier} { return T_IDENTIFIER; }
+{Designator} { yypushback(1); yybegin(DESIGNATOR); }
+
+<DESIGNATOR> {
+    {Str} { yybegin(YYINITIAL); return T_STR_DESIGNATOR; }
+    {Int} { yybegin(YYINITIAL); return T_INT_DESIGNATOR; }
+    {Float} { yybegin(YYINITIAL); return T_FLOAT_DESIGNATOR; }
+    {Double} { yybegin(YYINITIAL); return T_DOUBLE_DESIGNATOR; }
+}
 
 <COMMENT> ~{LineTerminator} { yybegin(YYINITIAL); return T_COMMENT; }
 

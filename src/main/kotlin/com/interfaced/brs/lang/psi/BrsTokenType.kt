@@ -1,8 +1,8 @@
 package com.interfaced.brs.lang.psi
 
 import com.intellij.psi.tree.IElementType
-import com.interfaced.brs.lang.BSLanguage
+import com.interfaced.brs.lang.BrsLanguage
 
-class BSTokenType(debugName: String) : IElementType(debugName, BSLanguage.INSTANCE) {
+class BrsTokenType(debugName: String) : IElementType(debugName, BrsLanguage.INSTANCE) {
     override fun toString(): String = "Brs:${super.toString()}"
 }

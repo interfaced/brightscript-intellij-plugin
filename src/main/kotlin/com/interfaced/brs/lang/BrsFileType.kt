@@ -1,19 +1,19 @@
 package com.interfaced.brs.lang
 
 import com.intellij.openapi.fileTypes.LanguageFileType
-import com.interfaced.brs.ide.icons.BSIcons
+import com.interfaced.brs.ide.icons.BrsIcons
 import javax.swing.Icon
 
-class BSFileType : LanguageFileType(BSLanguage.INSTANCE) {
+class BrsFileType : LanguageFileType(BrsLanguage.INSTANCE) {
     override fun getName(): String = "BrightScript"
 
     override fun getDescription(): String = "BrightScript file"
 
     override fun getDefaultExtension(): String = "brs"
 
-    override fun getIcon(): Icon? = BSIcons.FILE
+    override fun getIcon(): Icon? = BrsIcons.FILE
 
     companion object {
-        val INSTANCE = BSFileType()
+        val INSTANCE = BrsFileType()
     }
 }
