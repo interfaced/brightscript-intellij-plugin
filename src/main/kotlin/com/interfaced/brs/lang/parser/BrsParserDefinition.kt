@@ -15,7 +15,7 @@ import com.interfaced.brs.file.BrsFileElementType
 import com.interfaced.brs.lang.lexer.BrsLexer
 import com.interfaced.brs.lang.psi.BrsFile
 
-import com.interfaced.brs.lang.psi.BrsTypes.Factory
+import com.interfaced.brs.lang.psi.BrsTypes.*
 
 class BrsParserDefinition : ParserDefinition {
     private val tsWHITESPACES = TokenSet.create(TokenType.WHITE_SPACE)
@@ -24,7 +24,7 @@ class BrsParserDefinition : ParserDefinition {
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile = BrsFile(viewProvider)
 
-    override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
+    override fun getStringLiteralElements(): TokenSet = TokenSet.create(T_STRING_LITERAL)
 
     override fun getFileNodeType(): IFileElementType = BrsFileElementType.INSTANCE
 
@@ -34,5 +34,5 @@ class BrsParserDefinition : ParserDefinition {
 
     override fun createElement(node: ASTNode): PsiElement = Factory.createElement(node)
 
-    override fun getCommentTokens(): TokenSet = TokenSet.EMPTY
+    override fun getCommentTokens(): TokenSet = TokenSet.create(T_COMMENT)
 }

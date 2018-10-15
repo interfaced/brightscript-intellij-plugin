@@ -11,11 +11,49 @@
   psiPackage="com.interfaced.brs.lang.psi"
   psiImplPackage="com.interfaced.brs.lang.psi.impl"
 
+  tokens = [
+    T_LBRACE             = '{'
+    T_RBRACE             = '}'
+    T_LBRACK             = '['
+    T_RBRACK             = ']'
+    T_LPAREN             = '('
+    T_RPAREN             = ')'
+    T_COLON              = ':'
+    T_COMMA              = ','
+    T_EQ                 = '='
+    T_DOT                = '.'
+    T_LESS               = '<'
+    T_GREAT              = '>'
+    T_PLUS               = '+'
+    T_MINUS              = '-'
+    T_ASTERISK           = '*'
+    T_SLASH              = '/'
+    T_BACK_SLASH         = '\'
+    T_DOLLAR             = '$'
+    T_PERCENT            = '%'
+    T_EXCLAM             = '!'
+    T_SHARP              = '#'
+    T_AMP                = '&'
+    T_EXP                = '^'
+    T_LEFT_SHIFT         = '<<'
+    T_RIGHT_SHIFT        = '>>'
+    T_LEFT_SHIFT_ASSIGN  = '<<='
+    T_RIGHT_SHIFT_ASSIGN = '>>='
+    T_ADD_ASSIGN         = '+='
+    T_SUB_ASSIGN         = '-='
+    T_MUL_ASSIGN         = '*='
+    T_DIV_ASSIGN         = '/='
+    T_BACK_DIV_ASSIGN    = '\='
+    T_LESS_EQ            = '<='
+    T_GREAT_EQ           = '>='
+    T_INEQUAL            = '<>'
+  ]
+
   consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
   extends(".*expr")=expr
 }
 
-BrsProgram ::= (statement|chars) *
+BrsProgram ::= statement *
 
 // Statements
 private statement ::=
@@ -24,30 +62,31 @@ private statement ::=
   | while
   | function
   | sub
+  | assign
   | print
-  | comment
   | goto
   | dim
   | stop
   | return
-  | assign
   | expr
+  | T_COMMENT
 
 return ::= T_RETURN expr?
 dim ::= T_DIM identifier dimension_list
 stop ::= T_STOP
 goto ::= T_GOTO label
-label ::= identifier T_COLON
+label ::= identifier ':'
 print ::= T_PRINT expr
-assign ::= expr assign_op expr
-for ::= ( for_counter | for_each ) ( statement | exit_for ) * end_for
-while ::= T_WHILE expr ( statement | exit_while ) * end_while
-if ::= if_then ( statement | else ) * end_if
-comment ::= ( T_QUOTE | T_REM ) T_COMMENT
+assign ::= left_expr assign_op expr {rightAssociative=true}
+private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
 
-if_then ::= T_IF expr T_THEN?
-else ::= T_ELSE if_then? statement *
-private for_counter ::= T_FOR identifier "=" expr T_TO expr step?
+for ::= ( for_counter | for_each ) ( statement | exit_for ) * ( end_for | T_NEXT )
+while ::= T_WHILE expr ( statement | exit_while ) * end_while
+if ::= T_IF expr T_THEN? statement + else * end_if
+
+else ::= ((else_if expr T_THEN?) | T_ELSE) statement *
+else_if ::= (T_ELSE T_IF) | T_ELSE_IF
+private for_counter ::= T_FOR identifier '=' expr T_TO expr step?
 private for_each ::= T_FOR T_EACH identifier T_IN identifier
 function ::= T_FUNCTION function_definition end_function
 sub ::= T_SUB function_definition end_sub
@@ -56,15 +95,15 @@ as ::= T_AS type
 type ::= T_INTEGER | T_FLOAT | T_DOUBLE | T_BOOLEAN | T_STRING | T_OBJECT | T_DYNAMIC | T_FUNCTION | T_VOID
 parameter_list ::= '(' [ !')' parameter (',' parameter) * ] ')' {pin(".*")=1}
 parameter ::= identifier default? as?
-default ::= "=" expr
+default ::= '=' expr
 
-exit_while ::= T_EXIT T_WHILE
-exit_for ::= T_EXIT T_FOR
-end_for ::= T_END T_FOR
-end_while ::= T_END T_WHILE
-end_if ::= T_END T_IF
-end_sub ::= T_END T_SUB
-end_function ::= T_END T_FUNCTION
+exit_while ::= (T_EXIT T_WHILE) | T_EXIT_WHILE
+exit_for ::= (T_EXIT T_FOR) | T_EXIT_FOR
+end_for ::= (T_END T_FOR) | T_END_FOR
+end_while ::= (T_END T_WHILE) | T_END_WHILE
+end_if ::= (T_END T_IF) | T_END_IF
+end_sub ::= (T_END T_SUB) | T_END_SUB
+end_function ::= (T_END T_FUNCTION) | T_END_FUNCTION
 step ::= T_STEP expr
 
 // Expressions
@@ -78,24 +117,26 @@ expr ::=
   | unary_expr
   | exponential_expr
   | call_expr
-  | qualification_expr
+  | member_ref_expr
   | index_access_expr
-  | primary_group
+  | primary
 
-private primary_group ::= simple_ref_expr | literal_expr | new_array_expr
+private primary ::= identifier_ref_expr | literal_expr
 
 fake ref_expr ::= expr? '.' identifier
-simple_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
-qualification_expr ::= expr '.' identifier {extends=ref_expr elementType=ref_expr }
-call_expr ::= ref_expr arg_list
+identifier_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
+member_ref_expr ::= expr '.' identifier {extends=ref_expr elementType=ref_expr }
+call_expr ::= expr arg_list
 arg_list ::= '(' [ !')' expr (',' expr) * ] ')' { pin(".*")=1 }
 
 fake array_expr ::= expr? array
-new_array_expr ::= array { extends=array_expr elementType=array_expr }
+array_literal_expr ::= array { extends=array_expr elementType=array_expr }
 index_access_expr ::= expr array { extends=array_expr elementType=array_expr }
 
 array ::= '[' expr (',' expr) * ']' { pin(".*")=1 }
-literal_expr ::= T_NUMBER | T_STRING_LITERAL
+literal_expr ::= numeric_literal | array_literal_expr | bool_literal | T_INVALID | T_STRING_LITERAL
+numeric_literal ::= ( T_INTEGER_LIT | T_FLOAT_LIT ) ( '%' | '!' | '#' | '&' )?
+private bool_literal ::= T_TRUE | T_FALSE
 and_expr ::= expr T_AND expr
 or_expr ::= expr T_OR expr
 comp_expr ::= expr comp_op expr
@@ -105,23 +146,13 @@ mul_expr ::= expr mul_op expr
 unary_expr ::= unary_op expr
 exponential_expr ::= expr '^' expr
 
-assign_op ::=
-    '='
-    | T_LEFT_SHIFT_ASSIGN
-    | T_RIGHT_SHIFT_ASSIGN
-    | T_ADD_ASSIGN
-    | T_SUB_ASSIGN
-    | T_MUL_ASSIGN
-    | T_DIV_ASSIGN
-    | T_BACK_DIV_ASSIGN
-
-comp_op ::= '<' | '>' | '=' | T_GREAT_EQ | T_LESS_EQ | T_INEQUAL
-bit_shift_op ::= T_LEFT_SHIFT | T_RIGHT_SHIFT
+assign_op ::= '=' | '<<=' | '>>=' | '+=' | '-=' | '*=' | '/=' | '\='
+comp_op ::= '<' | '>' | '=' | '>=' | '<=' | '<>'
+bit_shift_op ::= '<<' | '>>'
 add_op ::= '-' | '+'
 mul_op ::= '*' | '/' | '\' | T_MOD
 unary_op ::= T_NOT | '-' | '+'
 
 identifier ::= T_IDENTIFIER type_designator?
 type_designator ::= '$' | '%' | '!' | '#' | '&'
-dimension_list ::= "[" [ !']' T_NUMBER ( ',' T_NUMBER ) * ] "]" { pin(".*")=1 }
-chars ::= T_CHAR+
+dimension_list ::= '[' [ !']' T_NUMBER ( ',' T_NUMBER ) * ] ']' { pin(".*")=1 }
