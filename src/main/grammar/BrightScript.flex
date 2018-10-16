@@ -143,7 +143,7 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 {Mod} { return T_MOD; }
 {Not} { return T_NOT; }
 {StringLiteral} { return T_STRING_LITERAL; }
-{Comment} { return T_COMMENT; }
+{Comment} { yypushback(1); return T_COMMENT; }
 {Identifier} { return T_IDENTIFIER; }
 {True} { return T_TRUE; }
 {False} { return T_FALSE; }
@@ -188,6 +188,7 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 ">="  { return T_GREAT_EQ;           }
 "<>"  { return T_INEQUAL;            }
 
+{LineTerminator} { return T_LINE_TERMINATOR; }
 {WhiteSpace} { return WHITE_SPACE; }
 
 [^] { return BAD_CHARACTER; }

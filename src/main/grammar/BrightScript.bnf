@@ -47,13 +47,61 @@
     T_LESS_EQ            = '<='
     T_GREAT_EQ           = '>='
     T_INEQUAL            = '<>'
+    T_LINE_TERMINATOR    = 'eol'
+    T_RETURN             = 'return'
+    T_DIM                = 'dim'
+    T_COMMENT            = 'comment'
+    T_STOP               = 'stop'
+    T_GOTO               = 'goto'
+    T_PRINT              = 'print'
+    T_NEXT               = 'next'
+    T_WHILE              = 'while'
+    T_IF                 = 'if'
+    T_THEN               = 'then'
+    T_ELSE               = 'else'
+    T_ELSE_IF            = 'elseif'
+    T_FOR                = 'for'
+    T_TO                 = 'to'
+    T_EACH               = 'each'
+    T_IN                 = 'in'
+    T_FUNCTION           = 'function'
+    T_SUB                = 'sub'
+    T_AS                 = 'as'
+    T_INTEGER            = 'integer'
+    T_FLOAT              = 'float'
+    T_DOUBLE             = 'double'
+    T_BOOLEAN            = 'boolean'
+    T_STRING             = 'string'
+    T_OBJECT             = 'object'
+    T_DYNAMIC            = 'dynamic'
+    T_VOID               = 'void'
+    T_TRUE               = 'true'
+    T_FALSE              = 'false'
+    T_INVALID            = 'invalid'
+    T_AND                = 'and'
+    T_OR                 = 'or'
+    T_MOD                = 'mod'
+    T_NOT                = 'not'
+    T_EXIT               = 'exit'
+    T_END                = 'end'
+    T_STEP               = 'step'
+    T_EXIT_WHILE         = 'exitwhile'
+    T_EXIT_FOR           = 'exitfor'
+    T_END_WHILE          = 'endwhile'
+    T_END_FOR            = 'endfor'
+    T_END_IF             = 'endif'
+    T_END_FUNCTION       = 'endfunction'
+    T_END_SUB            = 'endsub'
   ]
 
   consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
   extends(".*expr")=expr
 }
 
-BrsProgram ::= statement *
+BrsProgram ::= complete_statement *
+
+private complete_statement ::= program_statement? 'eol'
+private program_statement ::= statement ( ':' statement ) *
 
 // Statements
 private statement ::=
@@ -63,48 +111,53 @@ private statement ::=
   | function
   | sub
   | assign
+  | end
   | print
   | goto
   | dim
   | stop
   | return
   | expr
-  | T_COMMENT
+  | label
+  | 'comment'
 
-return ::= T_RETURN expr?
-dim ::= T_DIM identifier dimension_list
-stop ::= T_STOP
-goto ::= T_GOTO label
+return ::= 'return' expr?
+dim ::= 'dim' identifier dimension_list
+stop ::= 'stop'
+goto ::= 'goto' T_IDENTIFIER
 label ::= identifier ':'
-print ::= T_PRINT expr
+end ::= 'end'
+print ::= 'print' expr
 assign ::= left_expr assign_op expr {rightAssociative=true}
 private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
 
-for ::= ( for_counter | for_each ) ( statement | exit_for ) * ( end_for | T_NEXT )
-while ::= T_WHILE expr ( statement | exit_while ) * end_while
-if ::= T_IF expr T_THEN? statement + else * end_if
+for ::= ( for_counter | for_each ) ( exit_for | complete_statement ) * ( end_for | 'next' )
+while ::= 'while' expr 'eol' ( exit_while | complete_statement ) * end_while
+if ::= if_line | if_block
+private if_line ::= 'if' expr 'then'? program_statement ( else program_statement )?
+private if_block ::= 'if' expr 'then'? 'eol' complete_statement * else * end_if
 
-else ::= ((else_if expr T_THEN?) | T_ELSE) statement *
-else_if ::= (T_ELSE T_IF) | T_ELSE_IF
-private for_counter ::= T_FOR identifier '=' expr T_TO expr step?
-private for_each ::= T_FOR T_EACH identifier T_IN identifier
-function ::= T_FUNCTION function_definition end_function
-sub ::= T_SUB function_definition end_sub
-private function_definition ::= identifier parameter_list as? statement *
-as ::= T_AS type
-type ::= T_INTEGER | T_FLOAT | T_DOUBLE | T_BOOLEAN | T_STRING | T_OBJECT | T_DYNAMIC | T_FUNCTION | T_VOID
+else ::= ((else_if expr 'then'?) | 'else') 'eol' complete_statement *
+else_if ::= ('else' 'if') | 'elseif'
+private for_counter ::= 'for' identifier '=' expr 'to' expr step? 'eol'
+private for_each ::= 'for' 'each' identifier 'in' identifier 'eol'
+function ::= 'function' function_definition end_function
+sub ::= 'sub' function_definition end_sub
+private function_definition ::= identifier parameter_list as? 'eol' complete_statement *
+as ::= 'as' type
+type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function' | 'void'
 parameter_list ::= '(' [ !')' parameter (',' parameter) * ] ')' {pin(".*")=1}
 parameter ::= identifier default? as?
 default ::= '=' expr
 
-exit_while ::= (T_EXIT T_WHILE) | T_EXIT_WHILE
-exit_for ::= (T_EXIT T_FOR) | T_EXIT_FOR
-end_for ::= (T_END T_FOR) | T_END_FOR
-end_while ::= (T_END T_WHILE) | T_END_WHILE
-end_if ::= (T_END T_IF) | T_END_IF
-end_sub ::= (T_END T_SUB) | T_END_SUB
-end_function ::= (T_END T_FUNCTION) | T_END_FUNCTION
-step ::= T_STEP expr
+exit_while ::= (('exit' 'while') | 'exitwhile') 'eol'
+exit_for ::= (('exit' 'for') | 'exitfor') 'eol'
+end_for ::= ('end' 'for') | 'endfor'
+end_while ::= ('end' 'while') | 'endwhile'
+end_if ::= ('end' 'if') | 'endif'
+end_sub ::= ('end' 'sub') | 'endsub'
+end_function ::= ('end' 'function') | 'endfunction'
+step ::= 'step' expr 'eol'
 
 // Expressions
 expr ::=
@@ -121,7 +174,7 @@ expr ::=
   | index_access_expr
   | primary
 
-private primary ::= identifier_ref_expr | literal_expr
+private primary ::= identifier_ref_expr | literal_expr | paren_expr
 
 fake ref_expr ::= expr? '.' identifier
 identifier_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
@@ -134,25 +187,30 @@ array_literal_expr ::= array { extends=array_expr elementType=array_expr }
 index_access_expr ::= expr array { extends=array_expr elementType=array_expr }
 
 array ::= '[' expr (',' expr) * ']' { pin(".*")=1 }
-literal_expr ::= numeric_literal | array_literal_expr | bool_literal | T_INVALID | T_STRING_LITERAL
+literal_expr ::= numeric_literal | array_literal_expr | bool_literal | object_literal | 'invalid' | T_STRING_LITERAL
 numeric_literal ::= ( T_INTEGER_LIT | T_FLOAT_LIT ) ( '%' | '!' | '#' | '&' )?
-private bool_literal ::= T_TRUE | T_FALSE
-and_expr ::= expr T_AND expr
-or_expr ::= expr T_OR expr
+private bool_literal ::= 'true' | 'false'
+and_expr ::= expr 'and' expr
+or_expr ::= expr 'or' expr
 comp_expr ::= expr comp_op expr
 bit_shift_expr ::= expr bit_shift_op expr
 add_expr ::= expr add_op expr
 mul_expr ::= expr mul_op expr
 unary_expr ::= unary_op expr
+paren_expr ::= '(' expr ')'
 exponential_expr ::= expr '^' expr
+object_literal ::= '{' 'eol'? [ !'}' object_property ( property_separator object_property ) * ] 'eol'? '}'
+private property_separator ::= ',' | 'eol'
+private object_property ::= property_identifier ':' expr
+private property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 
 assign_op ::= '=' | '<<=' | '>>=' | '+=' | '-=' | '*=' | '/=' | '\='
 comp_op ::= '<' | '>' | '=' | '>=' | '<=' | '<>'
 bit_shift_op ::= '<<' | '>>'
 add_op ::= '-' | '+'
-mul_op ::= '*' | '/' | '\' | T_MOD
-unary_op ::= T_NOT | '-' | '+'
+mul_op ::= '*' | '/' | '\' | 'mod'
+unary_op ::= 'not' | '-' | '+'
 
 identifier ::= T_IDENTIFIER type_designator?
 type_designator ::= '$' | '%' | '!' | '#' | '&'
-dimension_list ::= '[' [ !']' T_NUMBER ( ',' T_NUMBER ) * ] ']' { pin(".*")=1 }
+dimension_list ::= '[' [ !']' T_INTEGER_LIT ( ',' T_INTEGER_LIT ) * ] ']' { pin(".*")=1 }
