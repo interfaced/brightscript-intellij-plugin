@@ -67,6 +67,7 @@ In = "in"
 Mod = "mod"
 Not = "not"
 Sub = "sub"
+Library = "library"
 
 // Types
 Integer = "integer"
@@ -144,10 +145,12 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 {Not} { return T_NOT; }
 {StringLiteral} { return T_STRING_LITERAL; }
 {Comment} { yypushback(1); return T_COMMENT; }
-{Identifier} { return T_IDENTIFIER; }
 {True} { return T_TRUE; }
 {False} { return T_FALSE; }
 {Invalid} { return T_INVALID; }
+{Library} { return T_LIBRARY; }
+// If is not reserved word then identifier
+{Identifier} { return T_IDENTIFIER; }
 
 {FloatLit} { return T_FLOAT_LIT; }
 {IntegerLit} { return T_INTEGER_LIT; }
@@ -187,6 +190,8 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 "<="  { return T_LESS_EQ;            }
 ">="  { return T_GREAT_EQ;           }
 "<>"  { return T_INEQUAL;            }
+";"   { return T_SEMICOLON;          }
+"@"   { return T_AT;                 }
 
 {LineTerminator} { return T_LINE_TERMINATOR; }
 {WhiteSpace} { return WHITE_SPACE; }

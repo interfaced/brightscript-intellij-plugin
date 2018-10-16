@@ -19,6 +19,7 @@
     T_LPAREN             = '('
     T_RPAREN             = ')'
     T_COLON              = ':'
+    T_SEMICOLON          = ';'
     T_COMMA              = ','
     T_EQ                 = '='
     T_DOT                = '.'
@@ -47,6 +48,7 @@
     T_LESS_EQ            = '<='
     T_GREAT_EQ           = '>='
     T_INEQUAL            = '<>'
+    T_AT                 = '@'
     T_LINE_TERMINATOR    = 'eol'
     T_RETURN             = 'return'
     T_DIM                = 'dim'
@@ -92,6 +94,7 @@
     T_END_IF             = 'endif'
     T_END_FUNCTION       = 'endfunction'
     T_END_SUB            = 'endsub'
+    T_LIBRARY            = 'library'
   ]
 
   consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
@@ -119,45 +122,53 @@ private statement ::=
   | return
   | expr
   | label
+  | exit_while
+  | exit_for
+  | library
   | 'comment'
 
+library ::= 'library' T_STRING_LITERAL
 return ::= 'return' expr?
 dim ::= 'dim' identifier dimension_list
 stop ::= 'stop'
 goto ::= 'goto' T_IDENTIFIER
 label ::= identifier ':'
 end ::= 'end'
-print ::= 'print' expr
+
+print ::= 'print' (output ',')? (location ',')? expr ( print_list_sep expr ) * print_list_sep?
+private print_list_sep ::= ( ',' | ';' )
+output ::= '#' expr
+location ::= '@' expr
+
 assign ::= left_expr assign_op expr {rightAssociative=true}
 private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
 
-for ::= ( for_counter | for_each ) ( exit_for | complete_statement ) * ( end_for | 'next' )
-while ::= 'while' expr 'eol' ( exit_while | complete_statement ) * end_while
+for ::= ( for_counter | for_each ) 'eol' complete_statement * ( end_for | 'next' )
+while ::= 'while' expr 'eol' complete_statement * end_while
 if ::= if_line | if_block
 private if_line ::= 'if' expr 'then'? program_statement ( else program_statement )?
 private if_block ::= 'if' expr 'then'? 'eol' complete_statement * else * end_if
 
 else ::= ((else_if expr 'then'?) | 'else') 'eol' complete_statement *
 else_if ::= ('else' 'if') | 'elseif'
-private for_counter ::= 'for' identifier '=' expr 'to' expr step? 'eol'
-private for_each ::= 'for' 'each' identifier 'in' identifier 'eol'
-function ::= 'function' function_definition end_function
-sub ::= 'sub' function_definition end_sub
-private function_definition ::= identifier parameter_list as? 'eol' complete_statement *
+private for_counter ::= 'for' identifier '=' expr 'to' expr step?
+private for_each ::= 'for' 'each' identifier 'in' identifier
+function ::= 'function' identifier parameter_list as? 'eol' complete_statement * end_function
+sub ::= 'sub' identifier parameter_list 'eol' complete_statement * end_sub
 as ::= 'as' type
 type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function' | 'void'
 parameter_list ::= '(' [ !')' parameter (',' parameter) * ] ')' {pin(".*")=1}
 parameter ::= identifier default? as?
 default ::= '=' expr
 
-exit_while ::= (('exit' 'while') | 'exitwhile') 'eol'
-exit_for ::= (('exit' 'for') | 'exitfor') 'eol'
+exit_while ::= ('exit' 'while') | 'exitwhile'
+exit_for ::= ('exit' 'for') | 'exitfor'
 end_for ::= ('end' 'for') | 'endfor'
 end_while ::= ('end' 'while') | 'endwhile'
 end_if ::= ('end' 'if') | 'endif'
 end_sub ::= ('end' 'sub') | 'endsub'
 end_function ::= ('end' 'function') | 'endfunction'
-step ::= 'step' expr 'eol'
+step ::= 'step' expr
 
 // Expressions
 expr ::=
