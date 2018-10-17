@@ -9,5 +9,5 @@ import com.interfaced.brs.lang.BrsLanguage
 class BrsFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, BrsLanguage.INSTANCE) {
     override fun getFileType(): FileType = BrsFileType.INSTANCE
 
-    override fun toString(): String = "BrightScriptFile:${this.name}"
+    override fun toString(): String = "BrsFile:${this.name}"
 }
