@@ -81,19 +81,16 @@ Void = "void"
 
 Identifier = [a-zA-Z\_][a-zA-Z\_0-9]*
 StringLiteral = "\"" ~"\""
-Comment = ("'"|{Rem}) ~{LineTerminator}
 
 Exponent = [edED] [-+]? {DecimalLit}
-HexLit = "&" [0-9a-fA-F]+
+HexLit = "&h" [0-9a-fA-F]+
 DecimalLit = [0-9]+
 
 IntegerLit = {DecimalLit} | {HexLit}
-FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
+FloatLit = {DecimalLit}? \. {DecimalLit} {Exponent}?
 
-%state S_COMMENT, S_TYPE
+%state S_COMMENT, S_TYPE, S_MEMBER
 %%
-
-{As} { yybegin(S_TYPE); return T_AS; }
 
 <S_TYPE> {
     {Integer}  { yybegin(YYINITIAL); return T_INTEGER; }
@@ -106,6 +103,16 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
     {Void}     { yybegin(YYINITIAL); return T_VOID; }
     {Function} { yybegin(YYINITIAL); return T_FUNCTION; }
 }
+
+<S_COMMENT> {
+    .* { yybegin(YYINITIAL); return T_COMMENT; }
+}
+
+<S_MEMBER> {
+    {Identifier} { yybegin(YYINITIAL); return T_IDENTIFIER; }
+}
+
+{As} { yybegin(S_TYPE); return T_AS; }
 
 {Function} { return T_FUNCTION; }
 {Sub} { return T_SUB; }
@@ -144,12 +151,11 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 {Mod} { return T_MOD; }
 {Not} { return T_NOT; }
 {StringLiteral} { return T_STRING_LITERAL; }
-{Comment} { yypushback(1); return T_COMMENT; }
+({Rem} | "'") { yypushback(yylength()); yybegin(S_COMMENT); }
 {True} { return T_TRUE; }
 {False} { return T_FALSE; }
 {Invalid} { return T_INVALID; }
 {Library} { return T_LIBRARY; }
-// If is not reserved word then identifier
 {Identifier} { return T_IDENTIFIER; }
 
 {FloatLit} { return T_FLOAT_LIT; }
@@ -164,7 +170,7 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 ":"   { return T_COLON;              }
 ","   { return T_COMMA;              }
 "="   { return T_EQ;                 }
-"."   { return T_DOT;                }
+"."   {yybegin(S_MEMBER);return T_DOT;}
 "<"   { return T_LESS;               }
 ">"   { return T_GREAT;              }
 "+"   { return T_PLUS;               }
@@ -191,7 +197,7 @@ FloatLit = {DecimalLit} \. {DecimalLit} {Exponent}?
 ">="  { return T_GREAT_EQ;           }
 "<>"  { return T_INEQUAL;            }
 ";"   { return T_SEMICOLON;          }
-"@"   { return T_AT;                 }
+"@"   {yybegin(S_MEMBER);return T_AT;}
 
 {LineTerminator} { return T_LINE_TERMINATOR; }
 {WhiteSpace} { return WHITE_SPACE; }

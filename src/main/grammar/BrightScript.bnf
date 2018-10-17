@@ -101,65 +101,117 @@
   extends(".*expr")=expr
 }
 
-BrsProgram ::= complete_statement *
+BrsProgram ::= ( statements | 'eol' ) *
 
-private complete_statement ::= program_statement? 'eol'
-private program_statement ::= statement ( ':' statement ) *
+private blank ::= 'eol' +
+private blank_maybe ::= blank ?
+private statements ::= statement (stmt_terminator statement) *
+private colon_terminated_statements ::= statement (':' statement) *
+private stmt_terminator ::= 'eol'+ | ':'
 
 // Statements
 private statement ::=
-    if
-  | for
-  | while
-  | function
-  | sub
-  | assign
-  | end
-  | print
-  | goto
-  | dim
-  | stop
-  | return
+    if_stmt
+  | function_stmt
+  | for_stmt
+  | while_stmt
+  | sub_stmt
+  | assign_stmt
+  | print_stmt
+  | goto_stmt
+  | dim_stmt
+  | stop_stmt
+  | label_stmt
+  | library_stmt
+  | exit_stmt
+  | return_stmt
   | expr
-  | label
-  | exit_while
-  | exit_for
-  | library
-  | 'comment'
 
-library ::= 'library' T_STRING_LITERAL
-return ::= 'return' expr?
-dim ::= 'dim' identifier dimension_list
-stop ::= 'stop'
-goto ::= 'goto' T_IDENTIFIER
-label ::= identifier ':'
-end ::= 'end'
+// DIM name (dim1, dim2, …, dimK)
+dim_stmt ::= 'dim' identifier dimension_list
+private dimension_list ::= '[' [ dim_list_items ] ']'
+private dim_list_items ::= T_INTEGER_LIT ( ',' T_INTEGER_LIT ) *
 
-print ::= 'print' (output ',')? (location ',')? expr ( print_list_sep expr ) * print_list_sep?
-private print_list_sep ::= ( ',' | ';' )
-output ::= '#' expr
-location ::= '@' expr
-
-assign ::= left_expr assign_op expr {rightAssociative=true}
+// variable = expression
+assign_stmt ::= left_expr assign_op expr {rightAssociative=true}
 private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
 
-for ::= ( for_counter | for_each ) 'eol' complete_statement * ( end_for | 'next' )
-while ::= 'while' expr 'eol' complete_statement * end_while
-if ::= if_line | if_block
-private if_line ::= 'if' expr 'then'? program_statement ( else program_statement )?
-private if_block ::= 'if' expr 'then'? 'eol' complete_statement * else * end_if
+// END TODO: parse end statement
+end_stmt ::= 'end'
 
-else ::= ((else_if expr 'then'?) | 'else') 'eol' complete_statement *
-else_if ::= ('else' 'if') | 'elseif'
+// STOP
+stop_stmt ::= 'stop'
+
+// EXIT ...
+exit_stmt ::= exit_for | exit_while
+
+// GOTO label
+goto_stmt ::= 'goto' T_IDENTIFIER
+
+// label
+label_stmt ::= identifier ':'
+
+// LIBRARY "lib"
+library_stmt ::= 'library' T_STRING_LITERAL
+
+// RETURN [expression]
+return_stmt ::= 'return' [ expr ]
+
+// FUNCTION([parameter [= default] AS type, …]) AS type / END FUNCTION
+function_stmt ::= function stmt_terminator [ statements stmt_terminator ] end_function
+private function ::= 'function' fn_tail
+private fn_tail ::= T_IDENTIFIER parameter_list as?
+parameter_list ::= '(' [ parameter_list_items ] ')'
+private parameter_list_items ::= parameter (',' parameter) *
+private parameter ::= identifier default? as?
+private default ::= '=' expr
+private as ::= 'as' type
+private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function' | 'void'
+
+// SUB (same as function but with type Void by default)
+sub_stmt ::= sub stmt_terminator [ statements stmt_terminator ] end_sub
+private sub ::= 'sub' fn_tail
+
+// PRINT item list
+print_stmt ::= 'print' [ output ',' ] [ location ',' ] print_item +
+private print_item ::= format_item | expr
+private format_item ::= ',' | ';'
+private output ::= '#' expr
+private location ::= '@' expr
+
+// FOR / END FOR
+for_stmt ::= for stmt_terminator [ statements stmt_terminator ] ( end_for | 'next' )
+private for ::= for_each | for_counter
+
+// FOR counter = exp TO exp [STEP exp]
 private for_counter ::= 'for' identifier '=' expr 'to' expr step?
-private for_each ::= 'for' 'each' identifier 'in' identifier
-function ::= 'function' identifier parameter_list as? 'eol' complete_statement * end_function
-sub ::= 'sub' identifier parameter_list 'eol' complete_statement * end_sub
-as ::= 'as' type
-type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function' | 'void'
-parameter_list ::= '(' [ !')' parameter (',' parameter) * ] ')' {pin(".*")=1}
-parameter ::= identifier default? as?
-default ::= '=' expr
+private step ::= 'step' expr
+
+// FOR EACH item IN object
+private for_each ::= 'for' 'each' identifier 'in' expr
+
+// WHILE expression / [statements] / END WHILE
+while_stmt ::= while stmt_terminator [ statements stmt_terminator ] end_while
+private while ::= 'while' expr
+
+// IF
+if_stmt ::= if_line_stmt | if_block_stmt
+// --- IF expression THEN statements [ELSE statements]
+private if_line_stmt ::= if colon_terminated_statements [ 'else' colon_terminated_statements ]
+
+// --- Block IF, ELSEIF, THEN, ENDIF
+private if_block_stmt ::= if stmt_terminator
+    [ statements stmt_terminator ]
+    [ else_if_stmts stmt_terminator ]
+    [ else_stmt stmt_terminator ]
+end_if
+private if ::= 'if' expr [ 'then' ]
+
+else_stmt ::= 'else' stmt_terminator [ statements ]
+else_if_stmt ::= else_if expr [ 'then' ] stmt_terminator [ statements ]
+
+private else_if_stmts ::= else_if_stmt ( stmt_terminator else_if_stmt ) *
+private else_if ::= ('else' 'if') | 'elseif'
 
 exit_while ::= ('exit' 'while') | 'exitwhile'
 exit_for ::= ('exit' 'for') | 'exitfor'
@@ -168,7 +220,6 @@ end_while ::= ('end' 'while') | 'endwhile'
 end_if ::= ('end' 'if') | 'endif'
 end_sub ::= ('end' 'sub') | 'endsub'
 end_function ::= ('end' 'function') | 'endfunction'
-step ::= 'step' expr
 
 // Expressions
 expr ::=
@@ -183,24 +234,43 @@ expr ::=
   | call_expr
   | member_ref_expr
   | index_access_expr
+  | anon_function_stmt_expr
   | primary
 
 private primary ::= identifier_ref_expr | literal_expr | paren_expr
 
-fake ref_expr ::= expr? '.' identifier
+fake ref_expr ::= expr? member_op identifier
+private member_op ::= '.' | '@'
 identifier_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
-member_ref_expr ::= expr '.' identifier {extends=ref_expr elementType=ref_expr }
+member_ref_expr ::= expr member_op identifier {extends=ref_expr elementType=ref_expr }
+
 call_expr ::= expr arg_list
-arg_list ::= '(' [ !')' expr (',' expr) * ] ')' { pin(".*")=1 }
+arg_list ::= '(' [ arg_list_items ] ')'
+private arg_list_items ::= expr (',' expr) *
+
+literal_expr ::= numeric_literal | array_literal_expr | bool_literal | object_literal | 'invalid' | T_STRING_LITERAL
+
+numeric_literal ::= ( T_INTEGER_LIT | T_FLOAT_LIT ) ( '%' | '!' | '#' | '&' )?
 
 fake array_expr ::= expr? array
 array_literal_expr ::= array { extends=array_expr elementType=array_expr }
 index_access_expr ::= expr array { extends=array_expr elementType=array_expr }
 
-array ::= '[' expr (',' expr) * ']' { pin(".*")=1 }
-literal_expr ::= numeric_literal | array_literal_expr | bool_literal | object_literal | 'invalid' | T_STRING_LITERAL
-numeric_literal ::= ( T_INTEGER_LIT | T_FLOAT_LIT ) ( '%' | '!' | '#' | '&' )?
+array ::= '[' blank_maybe [ array_items ] ','? blank_maybe ']'
+private array_items ::= expr ( property_separator expr ) *
+
 private bool_literal ::= 'true' | 'false'
+
+object_literal ::= '{' blank_maybe [ object_items ] ','? blank_maybe '}'
+private object_items ::= object_property ( property_separator object_property ) *
+private property_separator ::= (',' blank) | ',' | blank
+private object_property ::= property_identifier ':' expr
+private property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
+
+// Anonymous Function
+anon_function_stmt_expr ::= anon_function stmt_terminator [statements stmt_terminator ] end_function
+private anon_function ::= 'function' parameter_list as?
+
 and_expr ::= expr 'and' expr
 or_expr ::= expr 'or' expr
 comp_expr ::= expr comp_op expr
@@ -210,10 +280,6 @@ mul_expr ::= expr mul_op expr
 unary_expr ::= unary_op expr
 paren_expr ::= '(' expr ')'
 exponential_expr ::= expr '^' expr
-object_literal ::= '{' 'eol'? [ !'}' object_property ( property_separator object_property ) * ] 'eol'? '}'
-private property_separator ::= ',' | 'eol'
-private object_property ::= property_identifier ':' expr
-private property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 
 assign_op ::= '=' | '<<=' | '>>=' | '+=' | '-=' | '*=' | '/=' | '\='
 comp_op ::= '<' | '>' | '=' | '>=' | '<=' | '<>'
@@ -224,4 +290,3 @@ unary_op ::= 'not' | '-' | '+'
 
 identifier ::= T_IDENTIFIER type_designator?
 type_designator ::= '$' | '%' | '!' | '#' | '&'
-dimension_list ::= '[' [ !']' T_INTEGER_LIT ( ',' T_INTEGER_LIT ) * ] ']' { pin(".*")=1 }
