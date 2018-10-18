@@ -103,11 +103,11 @@
 
 BrsProgram ::= ( statements | 'eol' ) *
 
-private blank ::= 'eol' +
+blank ::= 'eol' +
 private blank_maybe ::= blank ?
 private statements ::= statement (stmt_terminator statement) *
 private colon_terminated_statements ::= statement (':' statement) *
-private stmt_terminator ::= 'eol'+ | ':'
+private stmt_terminator ::= blank | ':'
 
 // Statements
 private statement ::=
@@ -125,6 +125,7 @@ private statement ::=
   | library_stmt
   | exit_stmt
   | return_stmt
+  | end_stmt
   | expr
 
 // DIM name (dim1, dim2, …, dimK)
@@ -136,7 +137,7 @@ private dim_list_items ::= T_INTEGER_LIT ( ',' T_INTEGER_LIT ) *
 assign_stmt ::= left_expr assign_op expr {rightAssociative=true}
 private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
 
-// END TODO: parse end statement
+// END
 end_stmt ::= 'end'
 
 // STOP
@@ -207,19 +208,19 @@ private if_block_stmt ::= if stmt_terminator
 end_if
 private if ::= 'if' expr [ 'then' ]
 
-else_stmt ::= 'else' stmt_terminator [ statements ]
-else_if_stmt ::= else_if expr [ 'then' ] stmt_terminator [ statements ]
+else_stmt ::= 'else' [ stmt_terminator statements ]
+else_if_stmt ::= else_if expr [ 'then' ] [ stmt_terminator statements ]
 
 private else_if_stmts ::= else_if_stmt ( stmt_terminator else_if_stmt ) *
 private else_if ::= ('else' 'if') | 'elseif'
 
 exit_while ::= ('exit' 'while') | 'exitwhile'
 exit_for ::= ('exit' 'for') | 'exitfor'
-end_for ::= ('end' 'for') | 'endfor'
-end_while ::= ('end' 'while') | 'endwhile'
-end_if ::= ('end' 'if') | 'endif'
-end_sub ::= ('end' 'sub') | 'endsub'
-end_function ::= ('end' 'function') | 'endfunction'
+end_for ::= 'endfor'
+end_while ::= 'endwhile'
+end_if ::= 'endif'
+end_sub ::= 'endsub'
+end_function ::= 'endfunction'
 
 // Expressions
 expr ::=
@@ -240,7 +241,6 @@ expr ::=
 private primary ::= identifier_ref_expr | literal_expr | paren_expr
 
 fake ref_expr ::= expr? member_op identifier
-private member_op ::= '.' | '@'
 identifier_ref_expr ::= identifier { extends=ref_expr elementType=ref_expr }
 member_ref_expr ::= expr member_op identifier {extends=ref_expr elementType=ref_expr }
 
@@ -281,12 +281,13 @@ unary_expr ::= unary_op expr
 paren_expr ::= '(' expr ')'
 exponential_expr ::= expr '^' expr
 
-assign_op ::= '=' | '<<=' | '>>=' | '+=' | '-=' | '*=' | '/=' | '\='
-comp_op ::= '<' | '>' | '=' | '>=' | '<=' | '<>'
-bit_shift_op ::= '<<' | '>>'
-add_op ::= '-' | '+'
-mul_op ::= '*' | '/' | '\' | 'mod'
-unary_op ::= 'not' | '-' | '+'
+private assign_op ::= '=' | '<<=' | '>>=' | '+=' | '-=' | '*=' | '/=' | '\='
+private comp_op ::= '<' | '>' | '=' | '>=' | '<=' | '<>'
+private bit_shift_op ::= '<<' | '>>'
+private add_op ::= '-' | '+'
+private mul_op ::= '*' | '/' | '\' | 'mod'
+private unary_op ::= 'not' | '-' | '+'
+private member_op ::= '.' | '@'
 
 identifier ::= T_IDENTIFIER type_designator?
-type_designator ::= '$' | '%' | '!' | '#' | '&'
+private type_designator ::= '$' | '%' | '!' | '#' | '&'

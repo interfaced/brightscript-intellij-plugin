@@ -23,7 +23,7 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 %ignorecase
 
 LineTerminator = \r|\n|\r\n
-WhiteSpace     = {LineTerminator} | [ \t\f]
+WhiteSpace     = [ \t\f]
 
 // Reserved words
 Function = "function"
@@ -89,6 +89,8 @@ DecimalLit = [0-9]+
 IntegerLit = {DecimalLit} | {HexLit}
 FloatLit = {DecimalLit}? \. {DecimalLit} {Exponent}?
 
+EndWS = {End} {WhiteSpace}+
+
 %state S_COMMENT, S_TYPE, S_MEMBER
 %%
 
@@ -120,11 +122,11 @@ FloatLit = {DecimalLit}? \. {DecimalLit} {Exponent}?
 {Then} { return T_THEN; }
 {End} { return T_END; }
 
-{EndFor} { return T_END_FOR; }
-{EndWhile} { return T_END_WHILE; }
-{EndFunction} { return T_END_FUNCTION; }
-{EndIf} { return T_END_IF; }
-{EndSub} { return T_END_SUB; }
+{EndFor}      | ({EndWS} {For})      { return T_END_FOR; }
+{EndWhile}    | ({EndWS} {While})    { return T_END_WHILE; }
+{EndFunction} | ({EndWS} {Function}) { return T_END_FUNCTION; }
+{EndIf}       | ({EndWS} {If})       { return T_END_IF; }
+{EndSub}      | ({EndWS} {Sub})      { return T_END_SUB; }
 
 {Else} { return T_ELSE; }
 {ElseIf} { return T_ELSE_IF; }
@@ -200,6 +202,6 @@ FloatLit = {DecimalLit}? \. {DecimalLit} {Exponent}?
 "@"   {yybegin(S_MEMBER);return T_AT;}
 
 {LineTerminator} { return T_LINE_TERMINATOR; }
-{WhiteSpace} { return WHITE_SPACE; }
+{WhiteSpace}+ { return WHITE_SPACE; }
 
 [^] { return BAD_CHARACTER; }
