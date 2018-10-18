@@ -97,8 +97,8 @@
     T_LIBRARY            = 'library'
   ]
 
-  consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
-  extends(".*expr")=expr
+  consumeTokenMethod(".+_expr|expr")="consumeTokenFast"
+  extends(".+expr")=expr
 }
 
 BrsProgram ::= ( statements | 'eol' ) *
@@ -134,8 +134,8 @@ private dimension_list ::= '[' [ dim_list_items ] ']'
 private dim_list_items ::= T_INTEGER_LIT ( ',' T_INTEGER_LIT ) *
 
 // variable = expression
-assign_stmt ::= left_expr assign_op expr {rightAssociative=true}
-private left_expr ::= member_ref_expr | index_access_expr | identifier_ref_expr
+assign_stmt ::= variable assign_op expr {rightAssociative=true}
+private variable ::= member_ref_expr | identifier_ref_expr | index_access_expr
 
 // END
 end_stmt ::= 'end'
@@ -232,10 +232,10 @@ expr ::=
   | mul_expr
   | unary_expr
   | exponential_expr
-  | call_expr
   | member_ref_expr
   | index_access_expr
   | anon_function_stmt_expr
+  | call_expr
   | primary
 
 private primary ::= identifier_ref_expr | literal_expr | paren_expr
