@@ -37,7 +37,7 @@ End Sub
 function BreakIfRunError(ln) as Void
     el=GetLastRunCompileError()
     if el=invalid then
-        el=GetLastRunRuntimeError()
+        el$=GetLastRunRuntimeError()
         if el=&hFC or el=&hE2 then return
         'FC==ERR_NORMAL_END, E2=ERR_VALUE_RETURN
         print "Runtime Error (line ";ln;"): ";el
@@ -46,7 +46,7 @@ function BreakIfRunError(ln) as Void
         print "compile error (line ";ln;")"
         for each e in el
             for each i in e
-                print i;": ";e[i]
+                print @location, #width*2, i;": ";e[i]
             end for
         end for
         stop
@@ -61,7 +61,8 @@ End function""".trimIndent()
                 AttributesDescriptor("Comment", BrsHighlighter.COMMENT),
                 AttributesDescriptor("Constant", BrsHighlighter.CONSTANT),
                 AttributesDescriptor("String", BrsHighlighter.STRING),
-                AttributesDescriptor("Number", BrsHighlighter.NUMBER)
+                AttributesDescriptor("Number", BrsHighlighter.NUMBER),
+                AttributesDescriptor("Meta", BrsHighlighter.META)
         )
     }
 }
