@@ -265,7 +265,7 @@ object_literal ::= '{' blank_maybe [ object_items ] ','? blank_maybe '}'
 private object_items ::= object_property ( property_separator object_property ) *
 private property_separator ::= (',' blank) | ',' | blank
 private object_property ::= property_identifier ':' expr
-private property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
+property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 
 // Anonymous Function
 anon_function_stmt_expr ::= anon_function stmt_terminator [statements stmt_terminator ] end_function
