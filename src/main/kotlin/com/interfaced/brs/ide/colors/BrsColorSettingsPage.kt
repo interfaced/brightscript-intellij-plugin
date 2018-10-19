@@ -68,7 +68,8 @@ End function""".trimIndent()
                 AttributesDescriptor("Number", BrsHighlighter.NUMBER),
                 AttributesDescriptor("Meta", BrsHighlighter.META),
                 AttributesDescriptor("Function identifier", BrsHighlighter.DECLARATION),
-                AttributesDescriptor("Property", BrsHighlighter.PROPERTY)
+                AttributesDescriptor("Property", BrsHighlighter.PROPERTY),
+                AttributesDescriptor("Type", BrsHighlighter.TYPE)
         )
     }
 }

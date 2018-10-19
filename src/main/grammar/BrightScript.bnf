@@ -95,6 +95,8 @@
     T_END_FUNCTION       = 'endfunction'
     T_END_SUB            = 'endsub'
     T_LIBRARY            = 'library'
+    T_LONGINTEGER        = 'longinteger'
+    T_FUNCTION_TYPE      = 'function_type'
   ]
 
   consumeTokenMethod(".+_expr|expr")="consumeTokenFast"
@@ -167,7 +169,7 @@ private parameter_list_items ::= parameter (',' parameter) *
 private parameter ::= identifier default? as?
 private default ::= '=' expr
 private as ::= 'as' type
-private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function' | 'void'
+private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function_type' | 'void' | 'longinteger'
 
 // SUB (same as function but with type Void by default)
 sub_stmt ::= sub stmt_terminator [ statements stmt_terminator ] end_sub

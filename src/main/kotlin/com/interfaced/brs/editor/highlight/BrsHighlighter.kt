@@ -46,6 +46,10 @@ class BrsHighlighter : SyntaxHighlighterBase() {
             T_END_SUB,
             T_LIBRARY -> KEYWORD_KEYS
 
+            T_TRUE,
+            T_FALSE,
+            T_INVALID -> CONSTANT_KEYS
+
             T_INTEGER,
             T_FLOAT,
             T_DOUBLE,
@@ -54,9 +58,8 @@ class BrsHighlighter : SyntaxHighlighterBase() {
             T_OBJECT,
             T_DYNAMIC,
             T_VOID,
-            T_TRUE,
-            T_FALSE,
-            T_INVALID -> CONSTANT_KEYS
+            T_FUNCTION_TYPE,
+            T_LONGINTEGER -> TYPE_KEYS
 
             T_INTEGER_LIT,
             T_FLOAT_LIT -> NUMBER_KEYS
@@ -120,6 +123,10 @@ class BrsHighlighter : SyntaxHighlighterBase() {
                 "BRS.PROPERTY",
                 DefaultLanguageHighlighterColors.INSTANCE_FIELD
         )
+        val TYPE = TextAttributesKey.createTextAttributesKey(
+                "BRS.TYPE",
+                JavaHighlightingColors.TYPE_PARAMETER_NAME_ATTRIBUTES
+        )
 
         private val KEYWORD_KEYS = arrayOf(KEYWORD)
         private val COMMENT_KEYS = arrayOf(COMMENT)
@@ -129,6 +136,7 @@ class BrsHighlighter : SyntaxHighlighterBase() {
         private val CONSTANT_KEYS = arrayOf(CONSTANT)
         private val NUMBER_KEYS = arrayOf(NUMBER)
         private val META_KEYS = arrayOf(META)
+        private val TYPE_KEYS = arrayOf(TYPE)
 
         private val EMPTY = arrayOf<TextAttributesKey>()
     }

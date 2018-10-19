@@ -78,6 +78,7 @@ String = "string"
 Object = "object"
 Dynamic = "dynamic"
 Void = "void"
+LongInteger = "longinteger"
 
 Identifier = [a-zA-Z\_][a-zA-Z\_0-9]*
 StringLiteral = "\"" ~"\""
@@ -103,7 +104,8 @@ EndWS = {End} {WhiteSpace}+
     {Object}   { yybegin(YYINITIAL); return T_OBJECT; }
     {Dynamic}  { yybegin(YYINITIAL); return T_DYNAMIC; }
     {Void}     { yybegin(YYINITIAL); return T_VOID; }
-    {Function} { yybegin(YYINITIAL); return T_FUNCTION; }
+    {Function} { yybegin(YYINITIAL); return T_FUNCTION_TYPE; }
+    {LongInteger} { yybegin(YYINITIAL); return T_LONGINTEGER; }
 }
 
 <S_COMMENT> {
