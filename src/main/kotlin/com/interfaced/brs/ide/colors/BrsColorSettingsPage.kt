@@ -33,9 +33,13 @@ Sub Main()
     stop
 End Sub
 
-
 function BreakIfRunError(ln) as Void
     el=GetLastRunCompileError()
+    obj = {
+        prop: "foo",
+        "StrProp": 42
+        again: &hFAA
+    }
     if el=invalid then
         el$=GetLastRunRuntimeError()
         if el=&hFC or el=&hE2 then return
@@ -62,7 +66,9 @@ End function""".trimIndent()
                 AttributesDescriptor("Constant", BrsHighlighter.CONSTANT),
                 AttributesDescriptor("String", BrsHighlighter.STRING),
                 AttributesDescriptor("Number", BrsHighlighter.NUMBER),
-                AttributesDescriptor("Meta", BrsHighlighter.META)
+                AttributesDescriptor("Meta", BrsHighlighter.META),
+                AttributesDescriptor("Function identifier", BrsHighlighter.DECLARATION),
+                AttributesDescriptor("Property", BrsHighlighter.PROPERTY)
         )
     }
 }
