@@ -14,5 +14,6 @@
         <lang.parserDefinition language="BrightScript" implementationClass="com.interfaced.brs.lang.parser.BrsParserDefinition"/>
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
         <colorSettingsPage implementation="com.interfaced.brs.ide.colors.BrsColorSettingsPage"/>
+        <highlightVisitor implementation="com.interfaced.brs.editor.highlight.BrsHighlighterVisitor"/>
     </extensions>
 </idea-plugin>
