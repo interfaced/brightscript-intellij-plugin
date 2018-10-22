@@ -48,6 +48,7 @@ function BreakIfRunError(ln) as Void
         stop
     else
         print "compile error (line ";ln;")"
+        a = function(f) : f += 1 : endfunction
         for each e in el
             for each i in e
                 print @location, #width*2, i;": ";e[i]
@@ -61,6 +62,7 @@ End function""".trimIndent()
         private val DESCRIPTORS = arrayOf(
                 AttributesDescriptor("Keyword", BrsHighlighter.KEYWORD),
                 AttributesDescriptor("Comma", BrsHighlighter.COMMA),
+                AttributesDescriptor("Colon", BrsHighlighter.COLON),
                 AttributesDescriptor("Identifier", BrsHighlighter.IDENTIFIER),
                 AttributesDescriptor("Comment", BrsHighlighter.COMMENT),
                 AttributesDescriptor("Constant", BrsHighlighter.CONSTANT),

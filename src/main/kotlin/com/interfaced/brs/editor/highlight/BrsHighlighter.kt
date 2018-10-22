@@ -74,6 +74,7 @@ class BrsHighlighter : SyntaxHighlighterBase() {
 
             T_IDENTIFIER -> IDENTIFIER_KEYS
             T_COMMA -> COMMA_KEYS
+            T_COLON -> COLON_KEYS
             T_COMMENT -> COMMENT_KEYS
             T_STRING_LITERAL -> STRING_KEYS
             else -> EMPTY
@@ -127,10 +128,15 @@ class BrsHighlighter : SyntaxHighlighterBase() {
                 "BRS.TYPE",
                 JavaHighlightingColors.TYPE_PARAMETER_NAME_ATTRIBUTES
         )
+        val COLON = TextAttributesKey.createTextAttributesKey(
+                "BRS.COLON",
+                DefaultLanguageHighlighterColors.COMMA
+        )
 
         private val KEYWORD_KEYS = arrayOf(KEYWORD)
         private val COMMENT_KEYS = arrayOf(COMMENT)
         private val COMMA_KEYS = arrayOf(COMMA)
+        private val COLON_KEYS = arrayOf(COLON)
         private val IDENTIFIER_KEYS = arrayOf(IDENTIFIER)
         private val STRING_KEYS = arrayOf(STRING)
         private val CONSTANT_KEYS = arrayOf(CONSTANT)

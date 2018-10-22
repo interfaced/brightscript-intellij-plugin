@@ -24,9 +24,7 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     }
 
     override fun visitPropertyIdentifier(element: BrsPropertyIdentifier) {
-        if (element.node.firstChildNode.elementType == T_IDENTIFIER) {
-            highlight(element, BrsHighlighter.PROPERTY)
-        }
+        highlight(element, BrsHighlighter.PROPERTY)
         super.visitPropertyIdentifier(element)
     }
 
