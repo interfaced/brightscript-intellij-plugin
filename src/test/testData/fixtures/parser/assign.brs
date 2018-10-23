@@ -1,6 +1,13 @@
 a$ = "a rose is a rose"
 b1! = 1.23
 x = x-z1
+a <<= b
+a >>= b
+a += b
+a -= b
+a *= b
+a /= b
+a \= b
 obj = CreateObject("roAssociativeArray")
 obj.SendTrackingRequest = analyticsSendTrackingRequest
 obj.BaseData = obj.BaseData + "&sr=" + dimensions
