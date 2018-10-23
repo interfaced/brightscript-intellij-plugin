@@ -16,6 +16,11 @@ class BrsParsingTestCase : ParsingTestCase("fixtures/parser", "brs", true, BrsPa
     fun `test print`() = doTest(true)
     fun `test sub`() = doTest(true)
     fun `test number`() = doTest(true)
+    fun `test end`() = doTest(true)
+    fun `test exit`() = doTest(true)
+    fun `test library`() = doTest(true)
+    fun `test return`() = doTest(true)
+    fun `test stop`() = doTest(true)
 
     override fun getTestDataPath(): String = "src/test/testData"
     override fun skipSpaces(): Boolean = false
