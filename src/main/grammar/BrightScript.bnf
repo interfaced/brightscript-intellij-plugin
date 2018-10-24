@@ -267,7 +267,7 @@ private bool_literal ::= 'true' | 'false'
 object_literal ::= '{' blank_maybe [ object_items ] ','? blank_maybe '}'
 private object_items ::= object_property ( property_separator object_property ) *
 private property_separator ::= (',' blank) | ',' | blank
-private object_property ::= property_identifier ':' expr
+object_property ::= property_identifier ':' expr
 property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 
 // Anonymous Function

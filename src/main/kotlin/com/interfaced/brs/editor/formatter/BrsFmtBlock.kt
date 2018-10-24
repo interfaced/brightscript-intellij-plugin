@@ -42,7 +42,7 @@ class BrsFmtBlock(private val node: ASTNode,
         while (child != null) {
             val type = child.elementType
             if (type != WHITE_SPACE && type != T_LINE_TERMINATOR) {
-                blocks.add(BrsFmtBlock(child, Alignment.createAlignment(), computeIndent(child, node), null))
+                blocks.add(BrsFmtBlock(child, null, computeIndent(child, node), null))
             }
 
             child = child.treeNext
@@ -54,7 +54,7 @@ class BrsFmtBlock(private val node: ASTNode,
     override fun toString() = "${node.text} $textRange"
 
     companion object {
-        private fun doIndentIf(check: Boolean): Indent {
+        private fun indentIf(check: Boolean): Indent {
             return if (check) {
                 Indent.getNormalIndent()
             } else {
@@ -69,44 +69,43 @@ class BrsFmtBlock(private val node: ASTNode,
 
             return when (parentPsi) {
                 is BrsFunctionStmtImpl -> {
-                    doIndentIf(childPsi !is BrsEndFunctionImpl
+                    indentIf(childPsi !is BrsEndFunctionImpl
                             && childPsi !is BrsFnDeclImpl)
                 }
                 is BrsSubStmtImpl -> {
-                    doIndentIf(childPsi !is BrsEndSubImpl
+                    indentIf(childPsi !is BrsEndSubImpl
                             && childPsi !is BrsSubDeclImpl)
                 }
                 is BrsIfStmtImpl -> {
-                    doIndentIf(childPsi !is BrsEndIfImpl
+                    indentIf(childPsi !is BrsEndIfImpl
                             && childPsi !is BrsIfInitImpl
                             && childPsi !is BrsElseIfStmtImpl
                             && childPsi !is BrsElseStmtImpl)
                 }
                 is BrsElseIfStmtImpl -> {
-                    doIndentIf(childPsi !is BrsElseIfInitImpl)
+                    indentIf(childPsi !is BrsElseIfInitImpl)
                 }
                 is BrsElseStmtImpl -> {
-                    doIndentIf(childType != T_ELSE)
+                    indentIf(childType != T_ELSE)
                 }
                 is BrsForStmtImpl -> {
-                    doIndentIf(childPsi !is BrsEndForImpl
+                    indentIf(childPsi !is BrsEndForImpl
                             && childPsi !is BrsForInitImpl
                             && childType != T_NEXT)
                 }
                 is BrsWhileStmtImpl -> {
-                    doIndentIf(childPsi !is BrsEndWhileImpl
+                    indentIf(childPsi !is BrsEndWhileImpl
                             && childPsi !is BrsWhileInitImpl)
                 }
                 is BrsAnonFunctionStmtExprImpl -> {
-                    doIndentIf(childPsi !is BrsEndFunctionImpl
+                    indentIf(childPsi !is BrsEndFunctionImpl
                             && childPsi !is BrsAnonFunctionDeclImpl)
                 }
                 is BrsObjectLiteralImpl -> {
-                    doIndentIf(childType != T_LBRACE
-                            && childType != T_RBRACE)
+                    indentIf(childPsi is BrsObjectPropertyImpl)
                 }
                 is BrsArrayImpl -> {
-                    doIndentIf(childType != T_LBRACK
+                    indentIf(childType != T_LBRACK
                             && childType != T_RBRACK)
                 }
                 else -> Indent.getNoneIndent()

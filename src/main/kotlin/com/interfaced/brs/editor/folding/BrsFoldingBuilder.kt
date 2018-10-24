@@ -79,7 +79,7 @@ class BrsFoldingBuilder : FoldingBuilderEx() {
         }
 
         override fun visitObjectLiteral(o: BrsObjectLiteral) {
-            val keys = o.propertyIdentifierList
+            val keys = o.objectPropertyList
 
             if (keys.isNotEmpty()) {
                 fold(o, o.textRange)
