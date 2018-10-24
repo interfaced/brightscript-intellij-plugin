@@ -4,19 +4,19 @@ if x > 127 then print "out of range"
 If caveman = "fred" then print "flintstone" else print "rubble"
 
 if type(msg) = "roVideoPlayerEvent" then
-    if debug then print "video event"
-    if msg.isFullResult()
-        if debug then print "video finished"
-        return 9
-    endif
+	if debug then print "video event"
+	if msg.isFullResult()
+		if debug then print "video finished"
+		return 9
+	endif
 else if type(msg) = "roUniversalControlEvent" then
-    if debug then print "button press "; msg.GetInt()
-    HandleButton(msg.GetInt())
+	if debug then print "button press "; msg.GetInt()
+	HandleButton(msg.GetInt())
 elseif msg = invalid then
-    if debug print "timeout"
-    return 6
+	if debug print "timeout"
+	return 6
 else
-    print ""
+	print ""
 end if
 
 If type(5.tostr())<> "String" Then Stop

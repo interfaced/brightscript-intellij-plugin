@@ -22,7 +22,7 @@ foo.bar["baz"]
 ' anon function expr
 a = function(x, y) : return x + y : endfunction
 b = function(x, y)
-    return x - y
+	return x - y
 endFunction
 ' call expr
 baz()

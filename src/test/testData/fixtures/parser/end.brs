@@ -3,7 +3,7 @@ End
 END
 
 Sub main()
-    if true then
-        end
-    end if
+	if true then
+		end
+	end if
 endsub

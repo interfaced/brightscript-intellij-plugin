@@ -3,5 +3,5 @@ STOP
 Stop
 
 Sub main()
-    Stop
+	Stop
 Endsub
