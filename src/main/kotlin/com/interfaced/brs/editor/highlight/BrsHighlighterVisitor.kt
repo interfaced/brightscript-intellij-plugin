@@ -29,7 +29,12 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     }
 
     private fun highlightFunctionIdentifier(element: PsiElement) {
-        val identifier = element.node.findChildByType(T_IDENTIFIER)?.psi
+        val identifier = when (element) {
+            is BrsSubStmt -> element.subDecl.node.findChildByType(T_IDENTIFIER)?.psi
+            is BrsFunctionStmt -> element.fnDecl.node.findChildByType(T_IDENTIFIER)?.psi
+            else -> null
+        }
+
         if (identifier != null) {
             highlight(identifier, BrsHighlighter.DECLARATION)
         }

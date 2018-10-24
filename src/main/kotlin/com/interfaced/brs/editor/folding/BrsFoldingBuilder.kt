@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.interfaced.brs.lang.psi.*
 import com.interfaced.brs.lang.psi.impl.BrsArrayImpl
-import com.interfaced.brs.lang.psi.impl.BrsBlankImpl
 import com.interfaced.brs.lang.psi.impl.BrsObjectLiteralImpl
 
 class BrsFoldingBuilder : FoldingBuilderEx() {
@@ -38,67 +37,61 @@ class BrsFoldingBuilder : FoldingBuilderEx() {
             private val descriptors: MutableList<FoldingDescriptor>) : BrsVisitor() {
 
         override fun visitFunctionStmt(o: BrsFunctionStmt) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.fnDecl.textRange.endOffset
             val endOffset = o.endFunction.textRange.startOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitSubStmt(o: BrsSubStmt) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.subDecl.textRange.endOffset
             val endOffset = o.endSub.textRange.startOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitIfStmt(o: BrsIfStmt) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.ifInit.textRange.endOffset
             val endOffset = o.endIf?.textRange?.startOffset ?: o.textRange.endOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitForStmt(o: BrsForStmt) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.forInit.textRange.endOffset
             val endOffset = o.endFor?.textRange?.startOffset ?: o.textRange.endOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitWhileStmt(o: BrsWhileStmt) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.whileInit.textRange.endOffset
             val endOffset = o.endWhile.textRange.startOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitAnonFunctionStmtExpr(o: BrsAnonFunctionStmtExpr) {
-            val startOffset = getMultiLineStartOffset(o) ?: return
+            val startOffset = o.anonFunctionDecl.textRange.endOffset
             val endOffset = o.endFunction.textRange.startOffset
 
             fold(o, TextRange(startOffset, endOffset))
         }
 
         override fun visitObjectLiteral(o: BrsObjectLiteral) {
-            val blank = PsiTreeUtil.findChildOfType(o, BrsBlankImpl::class.java)
+            val keys = o.propertyIdentifierList
 
-            if (blank != null) {
+            if (keys.isNotEmpty()) {
                 fold(o, o.textRange)
             }
         }
 
         override fun visitArray(o: BrsArray) {
-            val blank = PsiTreeUtil.findChildOfType(o, BrsBlankImpl::class.java)
+            val items = o.exprList
 
-            if (blank != null) {
+            if (items.isNotEmpty()) {
                 fold(o, o.textRange)
             }
-        }
-
-        private fun getMultiLineStartOffset(element: PsiElement): Int? {
-            val blank = PsiTreeUtil.findChildOfType(element, BrsBlankImpl::class.java)
-
-            return blank?.textRange?.startOffset
         }
 
         private fun fold(element: PsiElement, range: TextRange) {
