@@ -1,4 +1,5 @@
 import com.intellij.testFramework.ParsingTestCase
+import com.interfaced.brs.BrsTestUtil
 import com.interfaced.brs.lang.parser.BrsParserDefinition
 
 class BrsParsingTestCase : ParsingTestCase("fixtures/parser", "brs", true, BrsParserDefinition()) {
@@ -29,15 +30,6 @@ class BrsParsingTestCase : ParsingTestCase("fixtures/parser", "brs", true, BrsPa
 
     override fun getTestName(lowercaseFirstLetter: Boolean): String {
         val camelCase = super.getTestName(lowercaseFirstLetter)
-        return camelOrWordsToSnake(camelCase)
-    }
-
-    companion object {
-        @JvmStatic
-        fun camelOrWordsToSnake(name: String): String {
-            if (' ' in name) return name.trim().replace(" ", "_")
-
-            return name.split("(?=[A-Z])".toRegex()).joinToString("_", transform = String::toLowerCase)
-        }
+        return BrsTestUtil.camelOrWordsToSnake(camelCase)
     }
 }

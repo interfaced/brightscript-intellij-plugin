@@ -105,7 +105,7 @@
 
 BrsProgram ::= ( statements | 'eol' ) *
 
-blank ::= 'eol' +
+private blank ::= 'eol' +
 private blank_maybe ::= blank ?
 private statements ::= statement (stmt_terminator statement) *
 private colon_terminated_statements ::= statement (':' statement) *
@@ -161,8 +161,8 @@ library_stmt ::= 'library' T_STRING_LITERAL
 return_stmt ::= 'return' [ expr ]
 
 // FUNCTION([parameter [= default] AS type, …]) AS type / END FUNCTION
-function_stmt ::= function stmt_terminator [ statements stmt_terminator ] end_function
-private function ::= 'function' fn_tail
+function_stmt ::= fn_decl stmt_terminator [ statements stmt_terminator ] end_function
+fn_decl ::= 'function' fn_tail
 private fn_tail ::= T_IDENTIFIER parameter_list as?
 parameter_list ::= '(' [ parameter_list_items ] ')'
 private parameter_list_items ::= parameter (',' parameter) *
@@ -172,8 +172,8 @@ private as ::= 'as' type
 private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function_type' | 'void' | 'longinteger'
 
 // SUB (same as function but with type Void by default)
-sub_stmt ::= sub stmt_terminator [ statements stmt_terminator ] end_sub
-private sub ::= 'sub' fn_tail
+sub_stmt ::= sub_decl stmt_terminator [ statements stmt_terminator ] end_sub
+sub_decl ::= 'sub' fn_tail
 
 // PRINT item list
 print_stmt ::= 'print' [ output ',' ] [ location ',' ] print_item +
@@ -183,8 +183,8 @@ private output ::= '#' expr
 private location ::= '@' expr
 
 // FOR / END FOR
-for_stmt ::= for stmt_terminator [ statements stmt_terminator ] ( end_for | 'next' )
-private for ::= for_each | for_counter
+for_stmt ::= for_init stmt_terminator [ statements stmt_terminator ] ( end_for | 'next' )
+for_init ::= for_each | for_counter
 
 // FOR counter = exp TO exp [STEP exp]
 private for_counter ::= 'for' identifier '=' expr 'to' expr step?
@@ -194,24 +194,25 @@ private step ::= 'step' expr
 private for_each ::= 'for' 'each' identifier 'in' expr
 
 // WHILE expression / [statements] / END WHILE
-while_stmt ::= while stmt_terminator [ statements stmt_terminator ] end_while
-private while ::= 'while' expr
+while_stmt ::= while_init stmt_terminator [ statements stmt_terminator ] end_while
+while_init ::= 'while' expr
 
 // IF
 if_stmt ::= if_line_stmt | if_block_stmt
 // --- IF expression THEN statements [ELSE statements]
-private if_line_stmt ::= if colon_terminated_statements [ 'else' colon_terminated_statements ]
+private if_line_stmt ::= if_init colon_terminated_statements [ 'else' colon_terminated_statements ]
 
 // --- Block IF, ELSEIF, THEN, ENDIF
-private if_block_stmt ::= if stmt_terminator
+private if_block_stmt ::= if_init stmt_terminator
     [ statements stmt_terminator ]
     [ else_if_stmts stmt_terminator ]
     [ else_stmt stmt_terminator ]
 end_if
-private if ::= 'if' expr [ 'then' ]
+if_init ::= 'if' expr [ 'then' ]
 
 else_stmt ::= 'else' [ stmt_terminator statements ]
-else_if_stmt ::= else_if expr [ 'then' ] [ stmt_terminator statements ]
+else_if_stmt ::= else_if_init [ stmt_terminator statements ]
+else_if_init ::= else_if expr [ 'then' ]
 
 private else_if_stmts ::= else_if_stmt ( stmt_terminator else_if_stmt ) *
 private else_if ::= ('else' 'if') | 'elseif'
@@ -266,12 +267,12 @@ private bool_literal ::= 'true' | 'false'
 object_literal ::= '{' blank_maybe [ object_items ] ','? blank_maybe '}'
 private object_items ::= object_property ( property_separator object_property ) *
 private property_separator ::= (',' blank) | ',' | blank
-private object_property ::= property_identifier ':' expr
+object_property ::= property_identifier ':' expr
 property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 
 // Anonymous Function
-anon_function_stmt_expr ::= anon_function stmt_terminator [statements stmt_terminator ] end_function
-private anon_function ::= 'function' parameter_list as?
+anon_function_stmt_expr ::= anon_function_decl stmt_terminator [ statements stmt_terminator ] end_function
+anon_function_decl ::= 'function' parameter_list as?
 
 and_expr ::= expr 'and' expr
 or_expr ::= expr 'or' expr
