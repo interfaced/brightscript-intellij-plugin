@@ -25,7 +25,20 @@ class BrsFmtBlock(private val node: ASTNode,
     private val mySubBlocks: List<Block> by lazy { buildChildren() }
 
     override fun getChildAttributes(newChildIndex: Int): ChildAttributes {
-        return ChildAttributes(Indent.getNoneIndent(), null)
+        val indent = when (node.psi) {
+            is BrsFunctionStmtImpl,
+            is BrsSubStmtImpl,
+            is BrsIfStmtImpl,
+            is BrsElseIfStmtImpl,
+            is BrsElseStmtImpl,
+            is BrsForStmtImpl,
+            is BrsWhileStmtImpl,
+            is BrsAnonFunctionStmtExprImpl,
+            is BrsObjectLiteralImpl,
+            is BrsArrayImpl -> Indent.getNormalIndent()
+            else -> Indent.getNoneIndent()
+        }
+        return ChildAttributes(indent, null)
     }
 
     override fun getWrap(): Wrap? = wrap
