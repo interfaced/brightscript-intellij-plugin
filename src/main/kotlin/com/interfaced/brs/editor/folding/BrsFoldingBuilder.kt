@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -11,7 +12,7 @@ import com.interfaced.brs.lang.psi.*
 import com.interfaced.brs.lang.psi.impl.BrsArrayImpl
 import com.interfaced.brs.lang.psi.impl.BrsObjectLiteralImpl
 
-class BrsFoldingBuilder : FoldingBuilderEx() {
+class BrsFoldingBuilder : FoldingBuilderEx(), DumbAware {
     override fun getPlaceholderText(node: ASTNode): String? {
         val psi = node.psi
         return when (psi) {
