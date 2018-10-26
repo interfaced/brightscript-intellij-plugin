@@ -1,11 +1,11 @@
 Function a()
-	return false
+    return false
 end function
 
 function b()
-	if a RETURN
+    if a RETURN
 endfunction
 
 function c()
-	return (a * a) + (b * b)
+    return (a * a) + (b * b)
 endfunction
