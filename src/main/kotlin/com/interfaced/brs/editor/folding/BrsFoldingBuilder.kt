@@ -9,6 +9,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.interfaced.brs.lang.psi.*
+import com.interfaced.brs.lang.psi.BrsTypes.T_ELSE
 import com.interfaced.brs.lang.psi.impl.BrsArrayImpl
 import com.interfaced.brs.lang.psi.impl.BrsObjectLiteralImpl
 
@@ -56,6 +57,18 @@ class BrsFoldingBuilder : FoldingBuilderEx(), DumbAware {
             val endOffset = o.endIf?.textRange?.startOffset ?: o.textRange.endOffset
 
             fold(o, TextRange(startOffset, endOffset))
+        }
+
+        override fun visitElseIfStmt(o: BrsElseIfStmt) {
+            val startOffset = o.elseIfInit.textRange.endOffset
+
+            fold(o, TextRange(startOffset, o.textRange.endOffset))
+        }
+
+        override fun visitElseStmt(o: BrsElseStmt) {
+            val startOffset = o.node.findChildByType(T_ELSE)?.textRange?.endOffset ?: return
+
+            fold(o, TextRange(startOffset, o.textRange.endOffset))
         }
 
         override fun visitForStmt(o: BrsForStmt) {
