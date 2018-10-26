@@ -6,6 +6,11 @@ import com.interfaced.brs.BrsTestUtil
 class BrsFoldingBuilderTest : LightCodeInsightFixtureTestCase() {
     fun `test function`() = doTest()
     fun `test object lit`() = doTest()
+    fun `test array lit`() = doTest()
+    fun `test sub`() = doTest()
+    fun `test if else`() = doTest()
+    fun `test for`() = doTest()
+    fun `test while`() = doTest()
 
     override fun getTestDataPath(): String = "src/test/testData"
     override fun getBasePath(): String = "fixtures/folding"

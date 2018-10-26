@@ -1,4 +1,6 @@
 <fold text='{...}'>{
+    empty: {}
+    oneline: <fold text='{...}'>{foo: 1, bar: 2}</fold>
     Text: "loading image....",
     TextAttrs: <fold text='{...}'>{
         Color:"#A0FFFFFF",
