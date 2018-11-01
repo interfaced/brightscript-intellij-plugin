@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.interfaced.brs-plugin</id>
     <name>BrightScript</name>
-    <vendor email="reefridge@ifaced.ru" url="http://interfaced.tv">Interfaced</vendor>
+    <vendor email="info@interfaced.ru" url="http://interfaced.tv">Interfaced</vendor>
 
     <description><![CDATA[
     BrightScript language support.

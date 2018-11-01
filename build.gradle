@@ -54,7 +54,14 @@ intellij {
 
 patchPluginXml {
     changeNotes """
-      .brs files
+      Features:<br>
+      <ul>
+        <li>Syntax highlighting</li>
+        <li>Code folding</li>
+        <li>Auto indentation</li>
+      </ul>
+      
+      <a href="https://github.com/interfaced/brightscript-intellij-plugin">More info ...</a>
       """
 }
 
