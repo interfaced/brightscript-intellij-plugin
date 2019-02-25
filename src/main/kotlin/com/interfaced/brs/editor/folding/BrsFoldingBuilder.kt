@@ -42,69 +42,73 @@ class BrsFoldingBuilder : FoldingBuilderEx(), DumbAware {
             val startOffset = o.fnDecl.textRange.endOffset
             val endOffset = o.endFunction.textRange.startOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitSubStmt(o: BrsSubStmt) {
             val startOffset = o.subDecl.textRange.endOffset
             val endOffset = o.endSub.textRange.startOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitIfStmt(o: BrsIfStmt) {
             val startOffset = o.ifInit.textRange.endOffset
             val endOffset = o.endIf?.textRange?.startOffset ?: o.textRange.endOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitElseIfStmt(o: BrsElseIfStmt) {
             val startOffset = o.elseIfInit.textRange.endOffset
+            val endOffset = o.textRange.endOffset
 
-            fold(o, TextRange(startOffset, o.textRange.endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitElseStmt(o: BrsElseStmt) {
             val startOffset = o.node.findChildByType(T_ELSE)?.textRange?.endOffset ?: return
+            val endOffset = o.textRange.endOffset
 
-            fold(o, TextRange(startOffset, o.textRange.endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitForStmt(o: BrsForStmt) {
             val startOffset = o.forInit.textRange.endOffset
             val endOffset = o.endFor?.textRange?.startOffset ?: o.textRange.endOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitWhileStmt(o: BrsWhileStmt) {
             val startOffset = o.whileInit.textRange.endOffset
             val endOffset = o.endWhile.textRange.startOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitAnonFunctionStmtExpr(o: BrsAnonFunctionStmtExpr) {
             val startOffset = o.anonFunctionDecl.textRange.endOffset
             val endOffset = o.endFunction.textRange.startOffset
 
-            fold(o, TextRange(startOffset, endOffset))
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
         override fun visitObjectLiteral(o: BrsObjectLiteral) {
             val keys = o.objectPropertyList
 
-            if (keys.isNotEmpty()) {
-                fold(o, o.textRange)
-            }
+            foldIf(keys.isNotEmpty(), o, o.textRange)
         }
 
         override fun visitArray(o: BrsArray) {
             val items = o.exprList
 
-            if (items.isNotEmpty()) {
-                fold(o, o.textRange)
+            foldIf(items.isNotEmpty(), o, o.textRange)
+        }
+
+        private fun foldIf(predicate: Boolean, element: PsiElement, range: TextRange) {
+            if (predicate) {
+                fold(element, range)
             }
         }
 
