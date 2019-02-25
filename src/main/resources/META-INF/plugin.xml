@@ -5,6 +5,15 @@
 
     <description><![CDATA[
     BrightScript language support.
+
+    Features:<br>
+    <ul>
+      <li>Syntax highlighting</li>
+      <li>Code folding</li>
+      <li>Auto indentation</li>
+    </ul>
+
+    <a href="https://github.com/interfaced/brightscript-intellij-plugin">More info ...</a>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
