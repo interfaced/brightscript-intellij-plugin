@@ -2,6 +2,9 @@
   parserClass="com.interfaced.brs.lang.parser.BrsParser"
   parserUtilClass="com.interfaced.brs.lang.parser.BrsParserUtil"
 
+  implements="com.interfaced.brs.lang.psi.ext.BrsElement"
+  extends='com.interfaced.brs.lang.psi.ext.BrsElementImpl'
+
   elementTypeHolderClass="com.interfaced.brs.lang.psi.BrsTypes"
   elementTypeClass="com.interfaced.brs.lang.psi.BrsCompositeElementType"
   tokenTypeClass="com.interfaced.brs.lang.psi.BrsTokenType"
@@ -101,6 +104,8 @@
 
   consumeTokenMethod(".+_expr|expr")="consumeTokenFast"
   extends(".+expr")=expr
+
+  generateTokenAccessors=true
 }
 
 BrsProgram ::= ( statements | 'eol' ) *
@@ -152,7 +157,7 @@ exit_stmt ::= exit_for | exit_while
 goto_stmt ::= 'goto' T_IDENTIFIER
 
 // label
-label_stmt ::= identifier ':'
+label_stmt ::= T_IDENTIFIER ':'
 
 // LIBRARY "lib"
 library_stmt ::= 'library' T_STRING_LITERAL
@@ -162,7 +167,10 @@ return_stmt ::= 'return' [ expr ]
 
 // FUNCTION([parameter [= default] AS type, …]) AS type / END FUNCTION
 function_stmt ::= fn_decl stmt_terminator [ statements stmt_terminator ] end_function
-fn_decl ::= 'function' fn_tail
+fn_decl ::= 'function' fn_tail {
+    implements = "com.interfaced.brs.lang.psi.ext.BrsNameIdentifierOwner"
+    mixin = "com.interfaced.brs.lang.psi.ext.BrsNamedElementImpl"
+}
 private fn_tail ::= T_IDENTIFIER parameter_list as?
 parameter_list ::= '(' [ parameter_list_items ] ')'
 private parameter_list_items ::= parameter (',' parameter) *
@@ -173,7 +181,10 @@ private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object
 
 // SUB (same as function but with type Void by default)
 sub_stmt ::= sub_decl stmt_terminator [ statements stmt_terminator ] end_sub
-sub_decl ::= 'sub' fn_tail
+sub_decl ::= 'sub' fn_tail {
+    implements = "com.interfaced.brs.lang.psi.ext.BrsNameIdentifierOwner"
+    mixin = "com.interfaced.brs.lang.psi.ext.BrsNamedElementImpl"
+}
 
 // PRINT item list
 print_stmt ::= 'print' [ output ',' ] [ location ',' ] print_item +
@@ -292,5 +303,8 @@ private mul_op ::= '*' | '/' | '\' | 'mod'
 private unary_op ::= 'not' | '-' | '+'
 private member_op ::= '.' | '@'
 
-identifier ::= T_IDENTIFIER type_designator?
+identifier ::= T_IDENTIFIER type_designator? {
+    mixin = "com.interfaced.brs.lang.psi.ext.BrsIdentifierImplMixin"
+    implements = "com.interfaced.brs.lang.psi.ext.BrsReferenceElement"
+}
 private type_designator ::= '$' | '%' | '!' | '#' | '&'
