@@ -29,8 +29,10 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     }
 
     override fun visitIdentifier(o: BrsIdentifier) {
-        if (o.reference.resolve() != null) {
-            highlight(o.tIdentifier, BrsHighlighter.DECLARATION)
+        val resolved = o.reference.resolve()
+
+        if (resolved is BrsFnDecl || resolved is BrsSubDecl) {
+            highlight(o.tIdentifier, BrsHighlighter.FN_IDENTIFIER)
         }
         super.visitIdentifier(o)
     }
