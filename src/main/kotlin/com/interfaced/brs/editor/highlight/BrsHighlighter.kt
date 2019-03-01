@@ -95,6 +95,10 @@ class BrsHighlighter : SyntaxHighlighterBase() {
                 "BRS.IDENTIFIER",
                 DefaultLanguageHighlighterColors.IDENTIFIER
         )
+        val FN_IDENTIFIER = TextAttributesKey.createTextAttributesKey(
+                "BRS.FN_IDENTIFIER",
+                DefaultLanguageHighlighterColors.STATIC_METHOD
+        )
         val COMMENT = TextAttributesKey.createTextAttributesKey(
                 "BRS.COMMENT",
                 DefaultLanguageHighlighterColors.LINE_COMMENT
