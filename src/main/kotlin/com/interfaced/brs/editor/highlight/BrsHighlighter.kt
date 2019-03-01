@@ -43,7 +43,8 @@ class BrsHighlighter : SyntaxHighlighterBase() {
             T_END_IF,
             T_END_FUNCTION,
             T_END_SUB,
-            T_LIBRARY -> KEYWORD_KEYS
+            T_LIBRARY,
+            T_QUESTION -> KEYWORD_KEYS
 
             T_TRUE,
             T_FALSE,

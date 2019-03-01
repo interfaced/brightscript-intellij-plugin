@@ -36,6 +36,7 @@
     T_DOLLAR             = '$'
     T_PERCENT            = '%'
     T_EXCLAM             = '!'
+    T_QUESTION           = '?'
     T_SHARP              = '#'
     T_AMP                = '&'
     T_EXP                = '^'
@@ -174,7 +175,7 @@ fn_decl ::= 'function' fn_tail {
 private fn_tail ::= T_IDENTIFIER parameter_list as?
 parameter_list ::= '(' [ parameter_list_items ] ')'
 private parameter_list_items ::= parameter (',' parameter) *
-parameter ::= T_IDENTIFIER default? as? {
+parameter ::= identifier default? as? {
     implements = "com.interfaced.brs.lang.psi.ext.BrsNameIdentifierOwner"
     mixin = "com.interfaced.brs.lang.psi.ext.BrsNamedElementImpl"
 }
@@ -190,7 +191,7 @@ sub_decl ::= 'sub' fn_tail {
 }
 
 // PRINT item list
-print_stmt ::= 'print' [ output ',' ] [ location ',' ] print_item +
+print_stmt ::= ( 'print' | '?' ) [ output ',' ] [ location ',' ] print_item +
 private print_item ::= format_item | expr
 private format_item ::= ',' | ';'
 private output ::= '#' expr

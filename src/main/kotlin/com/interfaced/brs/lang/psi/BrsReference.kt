@@ -24,9 +24,9 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
 
         // Function/Sub parameter
         val fnParameter = BrsUtil.getOwnedFunction(element)
-                ?.fnDecl?.parameterList?.parameterList?.find { it.tIdentifier.text.equals(key, true) }
+                ?.fnDecl?.parameterList?.parameterList?.find { it.identifier.tIdentifier.text.equals(key, true) }
         val subParameter = BrsUtil.getOwnedSub(element)
-                ?.subDecl?.parameterList?.parameterList?.find { it.tIdentifier.text.equals(key, true) }
+                ?.subDecl?.parameterList?.parameterList?.find { it.identifier.tIdentifier.text.equals(key, true) }
 
         if (fnParameter != null) return arrayOf(PsiElementResolveResult(fnParameter))
         if (subParameter != null) return arrayOf(PsiElementResolveResult(subParameter))
