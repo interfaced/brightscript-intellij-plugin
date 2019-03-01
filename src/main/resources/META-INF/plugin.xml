@@ -26,5 +26,6 @@
         <lang.foldingBuilder language="BrightScript" implementationClass="com.interfaced.brs.editor.folding.BrsFoldingBuilder"/>
         <colorSettingsPage implementation="com.interfaced.brs.ide.colors.BrsColorSettingsPage"/>
         <highlightVisitor implementation="com.interfaced.brs.editor.highlight.BrsHighlighterVisitor"/>
+        <elementDescriptionProvider implementation="com.interfaced.brs.lang.BrsDescriptionProvider"/>
     </extensions>
 </idea-plugin>

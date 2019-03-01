@@ -9,6 +9,10 @@ import com.interfaced.brs.lang.psi.ext.BrsElement
 class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     private val key = element.text
 
+    fun resolveFirst(): PsiElement? {
+        return multiResolve(false).firstOrNull()?.element
+    }
+
     override fun resolve(): PsiElement? {
         val resolveResults = multiResolve(false)
 

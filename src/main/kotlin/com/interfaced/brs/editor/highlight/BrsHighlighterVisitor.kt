@@ -29,7 +29,7 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     }
 
     override fun visitIdentifier(o: BrsIdentifier) {
-        val resolved = o.reference.resolve()
+        val resolved = o.reference.resolveFirst()
 
         if (resolved is BrsFnDecl || resolved is BrsSubDecl) {
             highlight(o.tIdentifier, BrsHighlighter.FN_IDENTIFIER)
