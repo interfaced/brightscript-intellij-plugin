@@ -185,6 +185,7 @@ EndWS = {End} {WhiteSpace}+
 "$"   { return T_DOLLAR;             }
 "%"   { return T_PERCENT;            }
 "!"   { return T_EXCLAM;             }
+"?"   { return T_QUESTION;           }
 "#"   { return T_SHARP;              }
 "&"   { return T_AMP;                }
 "^"   { return T_EXP;                }
