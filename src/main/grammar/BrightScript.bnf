@@ -174,7 +174,10 @@ fn_decl ::= 'function' fn_tail {
 private fn_tail ::= T_IDENTIFIER parameter_list as?
 parameter_list ::= '(' [ parameter_list_items ] ')'
 private parameter_list_items ::= parameter (',' parameter) *
-private parameter ::= identifier default? as?
+parameter ::= T_IDENTIFIER default? as? {
+    implements = "com.interfaced.brs.lang.psi.ext.BrsNameIdentifierOwner"
+    mixin = "com.interfaced.brs.lang.psi.ext.BrsNamedElementImpl"
+}
 private default ::= '=' expr
 private as ::= 'as' type
 private type ::= 'integer' | 'float' | 'double' | 'boolean' | 'string' | 'object' | 'dynamic' | 'function_type' | 'void' | 'longinteger'
