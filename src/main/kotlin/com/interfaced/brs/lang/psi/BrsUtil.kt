@@ -47,7 +47,7 @@ class BrsUtil {
                     ?.mapNotNull { it.subDecl }
                     ?.filter { it.tIdentifier.text.equals(key, true) }
 
-            return listOf(functionIdentifiers, subIdentifiers).filterNotNull().flatten()
+            return listOfNotNull(functionIdentifiers, subIdentifiers).flatten()
         }
 
         fun getOwnedFunction(element: PsiElement): BrsFunctionStmt? {

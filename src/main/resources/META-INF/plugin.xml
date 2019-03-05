@@ -19,6 +19,7 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <enterHandlerDelegate implementation="com.interfaced.brs.editor.typing.BrsEnterHandler"/>
         <fileTypeFactory implementation="com.interfaced.brs.lang.BrsFileTypeFactory"/>
         <lang.parserDefinition language="BrightScript" implementationClass="com.interfaced.brs.lang.parser.BrsParserDefinition"/>
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
