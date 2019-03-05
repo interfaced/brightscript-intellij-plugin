@@ -43,17 +43,23 @@ class BrsEnterHandler : EnterHandlerDelegateAdapter() {
         }
 
         return when (prev.node.elementType) {
-            BrsTypes.T_FUNCTION -> completeStatementAt(offset, "function", editor, file)
-            BrsTypes.T_IF -> completeStatementAt(offset, "if", editor, file)
-            BrsTypes.T_SUB -> completeStatementAt(offset, "sub", editor, file)
-            BrsTypes.T_FOR -> completeStatementAt(offset, "for", editor, file)
-            BrsTypes.T_WHILE -> completeStatementAt(offset, "while", editor, file)
+            BrsTypes.T_FUNCTION -> completeStatementAt(offset, formatEndStatement(prev.text, "function"), editor, file)
+            BrsTypes.T_IF -> completeStatementAt(offset, formatEndStatement(prev.text, "if"), editor, file)
+            BrsTypes.T_SUB -> completeStatementAt(offset, formatEndStatement(prev.text, "sub"), editor, file)
+            BrsTypes.T_FOR -> completeStatementAt(offset, formatEndStatement(prev.text, "for"), editor, file)
+            BrsTypes.T_WHILE -> completeStatementAt(offset, formatEndStatement(prev.text, "while"), editor, file)
             else -> EnterHandlerDelegate.Result.Continue
         }
     }
 
+    private fun formatEndStatement(openText: String, text: String): String {
+        if (StringUtil.isUpperCase(openText)) return "end $text".toUpperCase()
+        if (StringUtil.isCapitalized(openText)) return "End ${StringUtil.capitalize(text)}"
+        return "end $text"
+    }
+
     private fun completeStatementAt(offset: Int, text: String, editor: Editor, file: PsiFile): EnterHandlerDelegate.Result {
-        editor.document.insertString(offset, "\nend $text")
+        editor.document.insertString(offset, "\n$text")
         PsiDocumentManager.getInstance(file.project).commitDocument(editor.document)
 
         try {
