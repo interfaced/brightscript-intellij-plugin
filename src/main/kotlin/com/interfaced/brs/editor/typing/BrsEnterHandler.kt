@@ -19,7 +19,12 @@ class BrsEnterHandler : EnterHandlerDelegateAdapter() {
     override fun preprocessEnter(file: PsiFile, editor: Editor, caretOffsetRef: Ref<Int>, caretAdvanceRef: Ref<Int>, dataContext: DataContext, originalHandler: EditorActionHandler?): EnterHandlerDelegate.Result {
         if (file.language != BrsLanguage.INSTANCE) return EnterHandlerDelegate.Result.Continue
         val offset = caretOffsetRef.get()
-        val element = file.findElementAt(offset) ?: return EnterHandlerDelegate.Result.Continue
+        val endOffset = file.textRange.endOffset
+        var element = file.findElementAt(offset)
+
+        if (element == null && endOffset == offset) {
+           element = file.findElementAt(offset - 1) ?: return EnterHandlerDelegate.Result.Continue
+        } else if (element == null) return EnterHandlerDelegate.Result.Continue
 
         var prev = element.prevSibling ?: return EnterHandlerDelegate.Result.Continue
 
