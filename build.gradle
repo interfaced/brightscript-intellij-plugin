@@ -17,7 +17,7 @@ plugins {
 }
 
 group 'com.interfaced'
-version '0.1.1'
+version '0.2.0'
 
 apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.grammarkit'
@@ -55,8 +55,9 @@ intellij {
 patchPluginXml {
     changeNotes """
       <ul>
-        <li>Fixed support for IDEs without Java support</li>
-        <li>Fixed folding blocks with empty contents</li>
+        <li>Add support for `?` symbol as `print` alias</li>
+        <li>GoTo function/sub/parameter declaration</li>
+        <li>Statements auto-completion</li>
       </ul>
       """
 }

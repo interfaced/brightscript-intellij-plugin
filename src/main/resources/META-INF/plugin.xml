@@ -4,15 +4,15 @@
     <vendor email="info@interfaced.tv" url="http://interfaced.tv">Interfaced</vendor>
 
     <description><![CDATA[
-    BrightScript language support.
-
+    BrightScript language support.<br>
     Features:<br>
     <ul>
       <li>Syntax highlighting</li>
       <li>Code folding</li>
       <li>Auto indentation</li>
+      <li>Statements auto-completion</li>
+      <li>GoTo declaration</li>
     </ul>
-
     <a href="https://github.com/interfaced/brightscript-intellij-plugin">More info ...</a>
     ]]></description>
 

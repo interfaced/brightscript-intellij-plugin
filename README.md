@@ -9,6 +9,8 @@
 - Syntax highlighting
 - Code formatting (auto-indentation)
 - Code folding
+- Statements auto-completion
+- GoTo declaration
 
 ## Build
 
