@@ -9,13 +9,15 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
 import com.interfaced.brs.lang.BrsFileType
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.parentOfType
 
 class BrsUtil {
     companion object {
         private inline fun <reified T : PsiElement> getChildrenFromFiles(files: List<PsiFile>): List<Array<T>> {
             return files.mapNotNull { PsiTreeUtil.getChildrenOfType(it, T::class.java) }
         }
+
+        private inline fun <reified T : PsiElement> PsiElement.ancestorOfType(): T? =
+                PsiTreeUtil.getParentOfType(this, T::class.java, /* strict */ false)
 
         fun isPropertyIdentifier(element: PsiElement): Boolean {
             val prevSibling = element.prevSibling
@@ -51,11 +53,11 @@ class BrsUtil {
         }
 
         fun getOwnedFunction(element: PsiElement): BrsFunctionStmt? {
-            return element.parentOfType()
+            return element.ancestorOfType()
         }
 
         fun getOwnedSub(element: PsiElement): BrsSubStmt? {
-            return element.parentOfType()
+            return element.ancestorOfType()
         }
     }
 }
