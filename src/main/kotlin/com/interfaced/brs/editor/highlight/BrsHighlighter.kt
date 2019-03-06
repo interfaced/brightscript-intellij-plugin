@@ -2,7 +2,6 @@ package com.interfaced.brs.editor.highlight
 
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
-import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
@@ -44,7 +43,8 @@ class BrsHighlighter : SyntaxHighlighterBase() {
             T_END_IF,
             T_END_FUNCTION,
             T_END_SUB,
-            T_LIBRARY -> KEYWORD_KEYS
+            T_LIBRARY,
+            T_QUESTION -> KEYWORD_KEYS
 
             T_TRUE,
             T_FALSE,
@@ -86,7 +86,7 @@ class BrsHighlighter : SyntaxHighlighterBase() {
     companion object {
         val KEYWORD = TextAttributesKey.createTextAttributesKey(
                 "BRS.KEYWORD",
-                JavaHighlightingColors.KEYWORD
+                DefaultLanguageHighlighterColors.KEYWORD
         )
         val COMMA = TextAttributesKey.createTextAttributesKey(
                 "BRS.COMMA",
@@ -95,6 +95,10 @@ class BrsHighlighter : SyntaxHighlighterBase() {
         val IDENTIFIER = TextAttributesKey.createTextAttributesKey(
                 "BRS.IDENTIFIER",
                 DefaultLanguageHighlighterColors.IDENTIFIER
+        )
+        val FN_IDENTIFIER = TextAttributesKey.createTextAttributesKey(
+                "BRS.FN_IDENTIFIER",
+                DefaultLanguageHighlighterColors.STATIC_METHOD
         )
         val COMMENT = TextAttributesKey.createTextAttributesKey(
                 "BRS.COMMENT",
@@ -126,7 +130,7 @@ class BrsHighlighter : SyntaxHighlighterBase() {
         )
         val TYPE = TextAttributesKey.createTextAttributesKey(
                 "BRS.TYPE",
-                JavaHighlightingColors.TYPE_PARAMETER_NAME_ATTRIBUTES
+                DefaultLanguageHighlighterColors.PARAMETER
         )
         val COLON = TextAttributesKey.createTextAttributesKey(
                 "BRS.COLON",

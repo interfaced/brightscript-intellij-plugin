@@ -1,21 +1,33 @@
 <idea-plugin>
     <id>com.interfaced.brs-plugin</id>
     <name>BrightScript</name>
-    <vendor email="info@interfaced.ru" url="http://interfaced.tv">Interfaced</vendor>
+    <vendor email="info@interfaced.tv" url="http://interfaced.tv">Interfaced</vendor>
 
     <description><![CDATA[
-    BrightScript language support.
+    BrightScript language support.<br>
+    Features:<br>
+    <ul>
+      <li>Syntax highlighting</li>
+      <li>Code folding</li>
+      <li>Auto indentation</li>
+      <li>Statements auto-completion</li>
+      <li>GoTo declaration</li>
+    </ul>
+    <a href="https://github.com/interfaced/brightscript-intellij-plugin">More info ...</a>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <enterHandlerDelegate implementation="com.interfaced.brs.editor.typing.BrsEnterHandler"/>
         <fileTypeFactory implementation="com.interfaced.brs.lang.BrsFileTypeFactory"/>
         <lang.parserDefinition language="BrightScript" implementationClass="com.interfaced.brs.lang.parser.BrsParserDefinition"/>
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
         <lang.formatter language="BrightScript" implementationClass="com.interfaced.brs.editor.formatter.BrsFormattingModelBuilder"/>
         <lang.foldingBuilder language="BrightScript" implementationClass="com.interfaced.brs.editor.folding.BrsFoldingBuilder"/>
+        <lang.braceMatcher language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsBraceMatcher"/>
         <colorSettingsPage implementation="com.interfaced.brs.ide.colors.BrsColorSettingsPage"/>
         <highlightVisitor implementation="com.interfaced.brs.editor.highlight.BrsHighlighterVisitor"/>
+        <elementDescriptionProvider implementation="com.interfaced.brs.lang.BrsDescriptionProvider"/>
     </extensions>
 </idea-plugin>

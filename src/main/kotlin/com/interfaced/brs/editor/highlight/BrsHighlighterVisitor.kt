@@ -28,10 +28,19 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
         super.visitPropertyIdentifier(element)
     }
 
+    override fun visitIdentifier(o: BrsIdentifier) {
+        val resolved = o.reference.resolveFirst()
+
+        if (resolved is BrsFnDecl || resolved is BrsSubDecl) {
+            highlight(o.tIdentifier, BrsHighlighter.FN_IDENTIFIER)
+        }
+        super.visitIdentifier(o)
+    }
+
     private fun highlightFunctionIdentifier(element: PsiElement) {
         val identifier = when (element) {
-            is BrsSubStmt -> element.subDecl.node.findChildByType(T_IDENTIFIER)?.psi
-            is BrsFunctionStmt -> element.fnDecl.node.findChildByType(T_IDENTIFIER)?.psi
+            is BrsSubStmt -> element.subDecl.tIdentifier
+            is BrsFunctionStmt -> element.fnDecl.tIdentifier
             else -> null
         }
 
