@@ -25,6 +25,7 @@
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
         <lang.formatter language="BrightScript" implementationClass="com.interfaced.brs.editor.formatter.BrsFormattingModelBuilder"/>
         <lang.foldingBuilder language="BrightScript" implementationClass="com.interfaced.brs.editor.folding.BrsFoldingBuilder"/>
+        <lang.braceMatcher language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsBraceMatcher"/>
         <colorSettingsPage implementation="com.interfaced.brs.ide.colors.BrsColorSettingsPage"/>
         <highlightVisitor implementation="com.interfaced.brs.editor.highlight.BrsHighlighterVisitor"/>
         <elementDescriptionProvider implementation="com.interfaced.brs.lang.BrsDescriptionProvider"/>
