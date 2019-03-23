@@ -1,7 +1,6 @@
 BrsFile:goto_label.brs(0,47)
   BrsLabelStmtImpl(LABEL_STMT)(0,8)
-    BrsIdentifierImpl(IDENTIFIER)(0,7)
-      PsiElement(Brs:T_IDENTIFIER)('mylabel')(0,7)
+    PsiElement(Brs:T_IDENTIFIER)('mylabel')(0,7)
     PsiElement(Brs::)(':')(7,8)
   PsiElement(Brs:eol)('\n')(8,9)
   BrsPrintStmtImpl(PRINT_STMT)(9,34)

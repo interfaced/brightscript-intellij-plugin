@@ -11,7 +11,9 @@ a + b - c
 ' mul expr
 a * c / b \ d mod 2
 ' unary expr
--a : +b : --a : ++b : not false
+-a : +b : not false
+' increment decrement expr
+a-- : b++
 ' exponential expr
 a ^ b
 ' member ref expr
