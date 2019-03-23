@@ -28,6 +28,8 @@
     T_DOT                = '.'
     T_LESS               = '<'
     T_GREAT              = '>'
+    T_INCREMENT          = '++'
+    T_DECREMENT          = '--'
     T_PLUS               = '+'
     T_MINUS              = '-'
     T_ASTERISK           = '*'
@@ -246,6 +248,7 @@ expr ::=
   | and_expr
   | comp_expr
   | bit_shift_expr
+  | inc_dec_expr
   | add_expr
   | mul_expr
   | unary_expr
@@ -293,6 +296,7 @@ and_expr ::= expr 'and' expr
 or_expr ::= expr 'or' expr
 comp_expr ::= expr comp_op expr
 bit_shift_expr ::= expr bit_shift_op expr
+inc_dec_expr ::= expr ( T_INCREMENT | T_DECREMENT )
 add_expr ::= expr add_op expr
 mul_expr ::= expr mul_op expr
 unary_expr ::= unary_op expr

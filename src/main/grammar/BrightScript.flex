@@ -177,6 +177,8 @@ EndWS = {End} {WhiteSpace}+
 "."   {yybegin(S_MEMBER);return T_DOT;}
 "<"   { return T_LESS;               }
 ">"   { return T_GREAT;              }
+"++"  { return T_INCREMENT;          }
+"--"  { return T_DECREMENT;          }
 "+"   { return T_PLUS;               }
 "-"   { return T_MINUS ;             }
 "*"   { return T_ASTERISK;           }
