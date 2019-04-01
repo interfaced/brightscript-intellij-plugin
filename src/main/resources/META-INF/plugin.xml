@@ -4,8 +4,9 @@
     <vendor email="info@interfaced.tv" url="http://interfaced.tv">Interfaced</vendor>
 
     <description><![CDATA[
-    BrightScript language support.<br>
-    Features:<br>
+    <strong>BrightScript language support.</strong>
+    <br/>
+    Features:<br/>
     <ul>
       <li>Syntax highlighting</li>
       <li>Code folding</li>
