@@ -4,7 +4,7 @@
     <vendor email="info@interfaced.tv" url="http://interfaced.tv">Interfaced</vendor>
 
     <description><![CDATA[
-    <strong>BrightScript language support.</strong>
+    <strong>Provides Roku BrightScript language support.</strong>
     <br/>
     Features:<br/>
     <ul>
@@ -20,8 +20,8 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType name="BrightScript file" implementationClass="com.interfaced.brs.lang.BrsFileType" fieldName="INSTANCE" language="BrightScript" extensions="brs"/>
         <enterHandlerDelegate implementation="com.interfaced.brs.editor.typing.BrsEnterHandler"/>
-        <fileTypeFactory implementation="com.interfaced.brs.lang.BrsFileTypeFactory"/>
         <lang.parserDefinition language="BrightScript" implementationClass="com.interfaced.brs.lang.parser.BrsParserDefinition"/>
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
         <lang.formatter language="BrightScript" implementationClass="com.interfaced.brs.editor.formatter.BrsFormattingModelBuilder"/>

@@ -14,6 +14,7 @@ class BrsFileType : LanguageFileType(BrsLanguage.INSTANCE) {
     override fun getIcon(): Icon? = BrsIcons.FILE
 
     companion object {
+        @JvmField
         val INSTANCE = BrsFileType()
     }
 }
