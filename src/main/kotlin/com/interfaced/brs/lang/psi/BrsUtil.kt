@@ -27,8 +27,7 @@ class BrsUtil {
         }
 
         fun getFunctionDeclarations(project: Project, key: String): List<PsiElement> {
-            val virtualFiles = FileBasedIndex.getInstance()
-                    .getContainingFiles(FileTypeIndex.NAME, BrsFileType.INSTANCE, GlobalSearchScope.allScope(project))
+            val virtualFiles = FileTypeIndex.getFiles(BrsFileType.INSTANCE, GlobalSearchScope.allScope(project))
 
             val files = virtualFiles.mapNotNull { PsiManager.getInstance(project).findFile(it) }
             val functionIdentifiers = getChildrenFromFiles<BrsFunctionStmt>(files)

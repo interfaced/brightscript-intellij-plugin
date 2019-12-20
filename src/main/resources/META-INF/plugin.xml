@@ -20,7 +20,7 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileType name="BrightScript file" implementationClass="com.interfaced.brs.lang.BrsFileType" fieldName="INSTANCE" language="BrightScript" extensions="brs"/>
+        <fileType name="BrightScript" implementationClass="com.interfaced.brs.lang.BrsFileType" fieldName="INSTANCE" language="BrightScript" extensions="brs"/>
         <enterHandlerDelegate implementation="com.interfaced.brs.editor.typing.BrsEnterHandler"/>
         <lang.parserDefinition language="BrightScript" implementationClass="com.interfaced.brs.lang.parser.BrsParserDefinition"/>
         <lang.syntaxHighlighterFactory language="BrightScript" implementationClass="com.interfaced.brs.editor.highlight.BrsHighlighterFactory"/>
