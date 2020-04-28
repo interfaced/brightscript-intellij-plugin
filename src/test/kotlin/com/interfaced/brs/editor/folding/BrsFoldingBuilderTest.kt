@@ -1,9 +1,9 @@
 package com.interfaced.brs.editor.folding
 
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.interfaced.brs.BrsTestUtil
 
-class BrsFoldingBuilderTest : LightJavaCodeInsightFixtureTestCase() {
+class BrsFoldingBuilderTest : BasePlatformTestCase() {
     fun `test function`() = doTest()
     fun `test object lit`() = doTest()
     fun `test array lit`() = doTest()
