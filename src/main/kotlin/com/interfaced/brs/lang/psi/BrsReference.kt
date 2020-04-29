@@ -5,7 +5,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.containers.addIfNotNull
 import com.interfaced.brs.lang.psi.ext.BrsElement
 
 class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
@@ -13,14 +12,6 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
 
     fun resolveFirst(): PsiElement? {
         return multiResolve(false).firstOrNull()?.element
-    }
-
-    fun exprText(): String {
-        return if (element.parent is BrsRefExpr) {
-            element.parent.text
-        } else {
-            key
-        }
     }
 
     override fun resolve(): PsiElement? {
@@ -33,70 +24,91 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
         return null
     }
 
+    private fun getScopeEntries(scope: PsiElement): List<PsiElement> = PsiTreeUtil.getChildrenOfAnyType(scope,
+            BrsAssignStmt::class.java,
+            BrsAnonFunctionDecl::class.java,
+            BrsForInit::class.java,
+            BrsFunctionStmt::class.java,
+            BrsFnDecl::class.java,
+            BrsDimStmt::class.java,
+            BrsSubStmt::class.java,
+            BrsSubDecl::class.java
+            )
+
+    private fun resolveInLocalScope(scope: PsiElement): PsiElement? {
+        return resolveInScope(scope)
+                .filter {
+                    it.textOffset < element.textOffset
+                }
+                .maxBy { it.textOffset }
+    }
+
+    private fun resolveInScope(scope: PsiElement): List<PsiElement> {
+        return getScopeEntries(scope).mapNotNull { entry ->
+            when (entry) {
+                is BrsAssignStmt -> {
+                    val identifier = PsiTreeUtil.findChildOfType(entry.firstChild, BrsRefExpr::class.java, false)?.identifier
+                    val eq = identifier?.tIdentifier?.text?.equals(key, true) == true
+                    if (eq) identifier else null
+                }
+                is BrsAnonFunctionDecl, is BrsFnDecl, is BrsSubDecl -> {
+                    val parameterList = when (entry) {
+                        is BrsAnonFunctionDecl -> entry.parameterList.parameterList
+                        is BrsFnDecl -> entry.parameterList.parameterList
+                        is BrsSubDecl -> entry.parameterList.parameterList
+                        else -> null
+                    }
+
+                    parameterList?.find { it.identifier.tIdentifier.text.equals(key, true) }
+                }
+                is BrsForInit -> {
+                    val identifier = entry.identifier
+                    val eq = identifier.tIdentifier.text?.equals(key, true) == true
+                    if (eq) identifier else null
+                }
+                is BrsFunctionStmt, is BrsSubStmt -> {
+                    val decl = when (entry) {
+                        is BrsFunctionStmt -> entry.fnDecl
+                        is BrsSubStmt -> entry.subDecl
+                        else -> null
+                    }
+                    if (decl?.name?.equals(key, true) == true) decl else null
+                }
+                is BrsDimStmt -> {
+                    val identifier = entry.identifier
+                    if (identifier.tIdentifier.text.equals(key, true)) identifier else null
+                }
+                else -> null
+            }
+        }
+    }
+
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         // pairs of parents and target elements
-        val candidates = mutableListOf<List<PsiElement>>()
+        val candidates = mutableListOf<PsiElement>()
         val file = element.containingFile
 
-        // For counter
-        val ownedForBlock = BrsUtil.getAllOwnedForBlocks(element)
-                .filter {
-                    it.forInit.identifier.tIdentifier.text?.equals(exprText(), true) ?: false
-                }.maxBy { PsiTreeUtil.getDepth(it, file) }
-        if (ownedForBlock != null) {
-            candidates.add(listOf(ownedForBlock, ownedForBlock.forInit.identifier))
-        }
-
-        // Function parameter
-        val ownedFunction = BrsUtil.getAllOwnedFunctions(element)
-                .filter { fn ->
-                    val parameterList = fn.fnDecl.parameterList.parameterList
-                    parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) } != null
-                }.maxBy { PsiTreeUtil.getDepth(it, file) }
-        if (ownedFunction != null) {
-            val parameterList = ownedFunction.fnDecl.parameterList.parameterList
-            candidates.add(listOf(ownedFunction, parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) }!!))
-        }
-
-        // AnonFunction parameter
-        val ownedAnonFunction = BrsUtil.getAllOwnedAnonymousFunctions(element)
-                .filter { fn ->
-                    val parameterList = fn.anonFunctionDecl.parameterList.parameterList
-                    parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) } != null
-                }.maxBy { PsiTreeUtil.getDepth(it, file) }
-        if (ownedAnonFunction != null) {
-            val parameterList = ownedAnonFunction.anonFunctionDecl.parameterList.parameterList
-            candidates.add(listOf(ownedAnonFunction, parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) }!!))
-        }
-
-        //Sub parameter
-        val ownedSub = BrsUtil.getAllOwnedSubs(element)
-                .filter { fn ->
-                    val parameterList = fn.subDecl.parameterList.parameterList
-                    parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) } != null
-                }.maxBy { PsiTreeUtil.getDepth(it, file) }
-        if (ownedSub != null) {
-            val parameterList = ownedSub.subDecl.parameterList.parameterList
-            candidates.add(listOf(ownedSub, parameterList.find { it.identifier.tIdentifier.text.equals(exprText(), true) }!!))
-        }
-
-        if (candidates.isNotEmpty()) {
-            return if (candidates.size == 1) {
-                arrayOf(PsiElementResolveResult(candidates.first().last()))
-            } else {
-                val deepestCandidate = candidates.maxBy { PsiTreeUtil.getDepth(it.first(), file) }!!.last()
-                arrayOf(PsiElementResolveResult(deepestCandidate))
+        PsiTreeUtil.treeWalkUp(element, file) { current, _ ->
+            when (current) {
+                is PsiFile, is BrsForStmt, is BrsFunctionStmt, is BrsAnonFunctionStmtExpr, is BrsSubStmt -> {
+                    val scopeCandidate = resolveInLocalScope(current)
+                    if (scopeCandidate != null) {
+                        candidates.add(scopeCandidate)
+                        false
+                    } else true
+                }
+                else -> true
             }
         }
 
-        // Search declarations in containing file first
-        val declarationsInFile = BrsUtil.getFunctionDeclarations(element.containingFile, exprText())
-        if (declarationsInFile.isNotEmpty()) {
-            return declarationsInFile.map { PsiElementResolveResult(it) }.toTypedArray()
+        if (candidates.isNotEmpty()) {
+            return candidates.map { PsiElementResolveResult(it) }.toTypedArray()
         }
 
         // Search in project files (global)
         val project = element.project
-        return BrsUtil.getFunctionDeclarations(project, exprText()).map { PsiElementResolveResult(it) }.toTypedArray()
+        return BrsUtil.getProjectFiles(project)
+                .flatMap { resolveInScope(it) }
+                .map { PsiElementResolveResult(it) }.toTypedArray()
     }
 }

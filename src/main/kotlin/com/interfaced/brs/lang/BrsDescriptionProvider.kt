@@ -7,6 +7,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import com.interfaced.brs.lang.psi.BrsFnDecl
+import com.interfaced.brs.lang.psi.BrsIdentifier
 import com.interfaced.brs.lang.psi.BrsParameter
 import com.interfaced.brs.lang.psi.BrsSubDecl
 
@@ -28,9 +29,10 @@ class BrsDescriptionProvider : ElementDescriptionProvider {
 
     fun getTypeDescription(element: PsiElement): String? {
         return when (element) {
-            is BrsFnDecl -> "Function"
-            is BrsSubDecl -> "Sub"
+            is BrsFnDecl -> "function"
+            is BrsSubDecl -> "sub"
             is BrsParameter -> "parameter"
+            is BrsIdentifier -> "variable"
             else -> null
         }
     }
