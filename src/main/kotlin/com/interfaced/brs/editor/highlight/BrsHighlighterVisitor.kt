@@ -13,6 +13,14 @@ import com.interfaced.brs.lang.psi.BrsTypes.T_IDENTIFIER
 class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     private var infoHolder: HighlightInfoHolder? = null
 
+    override fun visitAssignStmt(element: BrsAssignStmt) {
+        if (element.firstChild is BrsRefExpr && element.lastChild is BrsAnonFunctionStmtExpr) {
+            val ref = element.firstChild as BrsRefExpr
+            highlight(ref.identifier.tIdentifier, BrsHighlighter.DECLARATION)
+        }
+        super.visitAssignStmt(element)
+    }
+
     override fun visitFunctionStmt(element: BrsFunctionStmt) {
         highlightFunctionIdentifier(element)
         super.visitFunctionStmt(element)
@@ -28,13 +36,20 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
         super.visitPropertyIdentifier(element)
     }
 
-    override fun visitIdentifier(o: BrsIdentifier) {
-        val resolved = o.reference.resolveFirst()
-
-        if (resolved is BrsFnDecl || resolved is BrsSubDecl) {
-            highlight(o.tIdentifier, BrsHighlighter.FN_IDENTIFIER)
+    override fun visitCallExpr(element: BrsCallExpr) {
+        if (element.expr is BrsRefExpr) {
+            val ref = element.expr as BrsRefExpr
+            val resolved = ref.identifier.reference.resolveFirst()
+            if (resolved is BrsFnDecl || resolved is BrsSubDecl || resolved is BrsIdentifier) {
+                highlight(ref.identifier.tIdentifier, BrsHighlighter.FN_IDENTIFIER)
+            }
         }
-        super.visitIdentifier(o)
+        super.visitCallExpr(element)
+    }
+
+    override fun visitForInit(element: BrsForInit) {
+        highlight(element.identifier.tIdentifier, BrsHighlighter.PROPERTY)
+        super.visitForInit(element)
     }
 
     private fun highlightFunctionIdentifier(element: PsiElement) {
