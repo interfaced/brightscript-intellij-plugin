@@ -88,14 +88,25 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
         val candidates = mutableListOf<PsiElement>()
         val file = element.containingFile
 
-        PsiTreeUtil.treeWalkUp(element, file) { current, _ ->
+        PsiTreeUtil.treeWalkUp(element, file) { current, prev ->
             when (current) {
-                is PsiFile, is BrsForStmt, is BrsFunctionStmt, is BrsAnonFunctionStmtExpr, is BrsSubStmt -> {
-                    val scopeCandidate = resolveInLocalScope(current)
-                    if (scopeCandidate != null) {
-                        candidates.add(scopeCandidate)
-                        false
-                    } else true
+                is PsiFile,
+                is BrsIfStmt,
+                is BrsElseIfStmt,
+                is BrsElseStmt,
+                is BrsForStmt,
+                is BrsFunctionStmt,
+                is BrsWhileStmt,
+                is BrsAnonFunctionStmtExpr,
+                is BrsSubStmt -> {
+                    if (current is BrsIfStmt && (prev is BrsElseIfStmt || prev is BrsElseStmt)) true
+                    else {
+                        val scopeCandidate = resolveInLocalScope(current)
+                        if (scopeCandidate != null) {
+                            candidates.add(scopeCandidate)
+                            false
+                        } else true
+                    }
                 }
                 else -> true
             }

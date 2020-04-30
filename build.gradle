@@ -61,7 +61,9 @@ intellij {
 patchPluginXml {
     changeNotes """
       <ul>
-        <li>Support for 2020.1</li>
+        <li>Line comment action</li>
+        <li>Scope based reference resolving</li>
+        <li>Basic keywords completion</li>
       </ul>
       """
 }

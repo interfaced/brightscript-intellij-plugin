@@ -31,5 +31,6 @@
         <colorSettingsPage implementation="com.interfaced.brs.ide.colors.BrsColorSettingsPage"/>
         <highlightVisitor implementation="com.interfaced.brs.editor.highlight.BrsHighlighterVisitor"/>
         <elementDescriptionProvider implementation="com.interfaced.brs.lang.BrsDescriptionProvider"/>
+        <completion.contributor language="BrightScript" implementationClass="com.interfaced.brs.lang.completion.BrsCompletionContributor"/>
     </extensions>
 </idea-plugin>
