@@ -256,6 +256,7 @@ expr ::=
   | member_ref_expr
   | index_access_expr
   | anon_function_stmt_expr
+  | anon_sub_stmt_expr
   | call_expr
   | primary
 
@@ -291,6 +292,10 @@ property_identifier ::= T_IDENTIFIER | T_STRING_LITERAL
 // Anonymous Function
 anon_function_stmt_expr ::= anon_function_decl stmt_terminator [ statements stmt_terminator ] end_function
 anon_function_decl ::= 'function' parameter_list as?
+
+// Anonymous Sub
+anon_sub_stmt_expr ::= anon_sub_decl stmt_terminator [ statements stmt_terminator ] end_sub
+anon_sub_decl ::= 'sub' parameter_list
 
 and_expr ::= expr 'and' expr
 or_expr ::= expr 'or' expr
