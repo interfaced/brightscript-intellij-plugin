@@ -87,6 +87,13 @@ class BrsFoldingBuilder : FoldingBuilderEx(), DumbAware {
             foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
         }
 
+        override fun visitAnonSubStmtExpr(o: BrsAnonSubStmtExpr) {
+            val startOffset = o.anonSubDecl.textRange.endOffset
+            val endOffset = o.endSub.textRange.startOffset
+
+            foldIf(startOffset != endOffset, o, TextRange(startOffset, endOffset))
+        }
+
         override fun visitAnonFunctionStmtExpr(o: BrsAnonFunctionStmtExpr) {
             val startOffset = o.anonFunctionDecl.textRange.endOffset
             val endOffset = o.endFunction.textRange.startOffset

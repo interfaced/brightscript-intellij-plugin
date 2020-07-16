@@ -27,6 +27,7 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
     private fun getScopeEntries(scope: PsiElement): List<PsiElement> = PsiTreeUtil.getChildrenOfAnyType(scope,
             BrsAssignStmt::class.java,
             BrsAnonFunctionDecl::class.java,
+            BrsAnonSubDecl::class.java,
             BrsForInit::class.java,
             BrsFunctionStmt::class.java,
             BrsFnDecl::class.java,
@@ -51,10 +52,11 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
                     val eq = identifier?.tIdentifier?.text?.equals(key, true) == true
                     if (eq) identifier else null
                 }
-                is BrsAnonFunctionDecl, is BrsFnDecl, is BrsSubDecl -> {
+                is BrsAnonFunctionDecl, is BrsFnDecl, is BrsAnonSubDecl, is BrsSubDecl -> {
                     val parameterList = when (entry) {
                         is BrsAnonFunctionDecl -> entry.parameterList.parameterList
                         is BrsFnDecl -> entry.parameterList.parameterList
+                        is BrsAnonSubDecl -> entry.parameterList.parameterList
                         is BrsSubDecl -> entry.parameterList.parameterList
                         else -> null
                     }
@@ -98,6 +100,7 @@ class BrsReference(element: BrsElement, textRange: TextRange) : PsiReferenceBase
                 is BrsFunctionStmt,
                 is BrsWhileStmt,
                 is BrsAnonFunctionStmtExpr,
+                is BrsAnonSubStmtExpr,
                 is BrsSubStmt -> {
                     if (current is BrsIfStmt && (prev is BrsElseIfStmt || prev is BrsElseStmt)) true
                     else {

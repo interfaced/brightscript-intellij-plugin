@@ -14,7 +14,7 @@ class BrsHighlighterVisitor : BrsVisitor(), HighlightVisitor {
     private var infoHolder: HighlightInfoHolder? = null
 
     override fun visitAssignStmt(element: BrsAssignStmt) {
-        if (element.firstChild is BrsRefExpr && element.lastChild is BrsAnonFunctionStmtExpr) {
+        if (element.firstChild is BrsRefExpr && (element.lastChild is BrsAnonSubStmtExpr || element.lastChild is BrsAnonFunctionStmtExpr)) {
             val ref = element.firstChild as BrsRefExpr
             highlight(ref.identifier.tIdentifier, BrsHighlighter.DECLARATION)
         }

@@ -50,6 +50,7 @@ class BrsCompletionContributor : CompletionContributor() {
 
     private object TypesCompletionProvider : CompletionProvider<CompletionParameters>() {
         private val keywords = listOf(
+                "Void",
                 "Boolean",
                 "Integer",
                 "LongInteger",

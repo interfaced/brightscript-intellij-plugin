@@ -34,6 +34,7 @@ class BrsFmtBlock(private val node: ASTNode,
             is BrsForStmtImpl,
             is BrsWhileStmtImpl,
             is BrsAnonFunctionStmtExprImpl,
+            is BrsAnonSubStmtExprImpl,
             is BrsObjectLiteralImpl,
             is BrsArrayImpl -> Indent.getNormalIndent()
             else -> Indent.getNoneIndent()
@@ -113,6 +114,10 @@ class BrsFmtBlock(private val node: ASTNode,
                 is BrsAnonFunctionStmtExprImpl -> {
                     indentIf(childPsi !is BrsEndFunctionImpl
                             && childPsi !is BrsAnonFunctionDeclImpl)
+                }
+                is BrsAnonSubStmtExprImpl -> {
+                    indentIf(childPsi !is BrsEndSubImpl
+                            && childPsi !is BrsAnonSubDeclImpl)
                 }
                 is BrsObjectLiteralImpl -> {
                     indentIf(childPsi is BrsObjectPropertyImpl)
