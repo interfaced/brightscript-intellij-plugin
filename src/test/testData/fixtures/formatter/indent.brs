@@ -33,6 +33,9 @@ print b
 a = function(x, y)
 return x + y
 endfunction
+b = sub(input)
+print input
+end sub
 else
 for a = 5 to 10 step -1
 print "!"

@@ -3,6 +3,10 @@ sub fn(x, y)<fold text='...'>
         end
     </fold>endsub
 
+    mysub = sub()<fold text='...'>
+        print "fred"
+    </fold>endsub
+
     a("foo", "bar")
 </fold>end sub
 
